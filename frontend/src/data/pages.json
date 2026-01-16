@@ -1,0 +1,219 @@
+{
+    "vendorCategories": [
+        "Wedding venues",
+        "Home decors",
+        "Farm house",
+        "Banquet hall",
+        "Convention centre",
+        "Community Hall",
+        "Religious community centres",
+        "Club House",
+        "Conference hall",
+        "Auditorium",
+        "Resort",
+        "Beach Resort",
+        "Hill Station Resort",
+        "Destination Resort",
+        "Gifting",
+        "Album designer",
+        "Bartender",
+        "Magicians",
+        "Anchors",
+        "Garlands",
+        "Painting Activities",
+        "German hangers",
+        "Mangala vadyam",
+        "Instant Photo Booths",
+        "Luxury Wedding Car Rentals",
+        "Hospitality",
+        "Floweral Arrangements",
+        "Beauticians",
+        "Pre wedding studios",
+        "Pre Birthday Studios",
+        "Photographers",
+        "Video Editors",
+        "Album designers",
+        "Drone pilots",
+        "Reels makers",
+        "Lights decorators",
+        "Fire works",
+        "Live food stalls",
+        "Caterings",
+        "Cooking Masters",
+        "Luxury car dealers",
+        "Bridal & Groom Couture",
+        "Wedding fashions",
+        "Special effects",
+        "Lighting and sound",
+        "Panditis / Priests",
+        "Transport and logistics",
+        "Facility Support Staff",
+        "Tent House supplier's",
+        "Birthday decors",
+        "LED screen",
+        "Live Streaming",
+        "Wedding Essentials",
+        "Live Performances"
+    ],
+    "languages": [
+        {
+            "code": "en",
+            "name": "English"
+        },
+        {
+            "code": "hi",
+            "name": "Hindi"
+        },
+        {
+            "code": "te",
+            "name": "Telugu"
+        },
+        {
+            "code": "ta",
+            "name": "Tamil"
+        }
+    ],
+    "locations": [
+        "Hyderabad",
+        "Banjara Hills, Hyd",
+        "Gachibowli, Hyd",
+        "Jubilee Hills, Hyd",
+        "Secunderabad",
+        "Madhapur, Hyd",
+        "Mumbai",
+        "Delhi",
+        "Bangalore"
+    ],
+    "userDashboard": {
+        "hero": {
+            "title": "Plan Your Perfect Utsav",
+            "subtitle": "1,200+ Trusted Vendors",
+            "buttonText": "Start Planning"
+        },
+        "categories": [
+            {
+                "id": "venues",
+                "label": "Venues",
+                "icon": "Calendar",
+                "color": "pink"
+            },
+            {
+                "id": "photo",
+                "label": "Photo",
+                "icon": "Camera",
+                "color": "orange"
+            },
+            {
+                "id": "decor",
+                "label": "Decor",
+                "icon": "Sparkles",
+                "color": "purple"
+            },
+            {
+                "id": "catering",
+                "label": "Catering",
+                "icon": "MapPin",
+                "color": "blue"
+            },
+            {
+                "id": "gifting",
+                "label": "Gifting",
+                "icon": "Grid",
+                "color": "indigo"
+            }
+        ]
+    },
+    "mockVendors": [
+        {
+            "id": 1,
+            "name": "Elite Celebrations",
+            "category": "Home decors",
+            "location": "Banjara Hills, Hyd",
+            "city": "Hyderabad",
+            "phone": "+91 91234 56789",
+            "rating": 4.9,
+            "reviews": 120,
+            "packages": [
+                {
+                    "id": 1,
+                    "name": "Basic Decor",
+                    "price": 15000
+                },
+                {
+                    "id": 2,
+                    "name": "Premium Wedding Decor",
+                    "price": 50000
+                }
+            ],
+            "coverImage": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80",
+            "profileImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+        },
+        {
+            "id": 2,
+            "name": "Sri Balaji Events",
+            "category": "Photographers",
+            "location": "Gachibowli, Hyd",
+            "city": "Hyderabad",
+            "phone": "+91 98765 43210",
+            "rating": 4.8,
+            "reviews": 85,
+            "packages": [
+                {
+                    "id": 3,
+                    "name": "Pre-Wedding",
+                    "price": 25000
+                },
+                {
+                    "id": 4,
+                    "name": "Wedding Film",
+                    "price": 75000
+                }
+            ],
+            "coverImage": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=80",
+            "profileImage": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80"
+        },
+        {
+            "id": 3,
+            "name": "Royal Catering Services",
+            "category": "Caterings",
+            "location": "Madhapur, Hyd",
+            "city": "Hyderabad",
+            "phone": "+91 99988 77766",
+            "rating": 4.7,
+            "reviews": 240,
+            "packages": [
+                {
+                    "id": 5,
+                    "name": "Veg Buffet",
+                    "price": 500
+                },
+                {
+                    "id": 6,
+                    "name": "Premium Non-Veg",
+                    "price": 850
+                }
+            ],
+            "coverImage": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=800&q=80",
+            "profileImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
+        },
+        {
+            "id": 4,
+            "name": "Utsav Venues",
+            "category": "Wedding venues",
+            "location": "Jubilee Hills, Hyd",
+            "city": "Hyderabad",
+            "phone": "+91 88877 66655",
+            "rating": 4.9,
+            "reviews": 310,
+            "packages": [
+                {
+                    "id": 7,
+                    "name": "Full Day Rental",
+                    "price": 200000
+                }
+            ],
+            "coverImage": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80",
+            "profileImage": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80"
+        }
+    ]
+}
