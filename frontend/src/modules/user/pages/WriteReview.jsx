@@ -45,8 +45,8 @@ const WriteReview = () => {
                     size={36}
                     strokeWidth={1.5}
                     className={`transition-all duration-500 transform ${star <= (hoverRating || rating)
-                            ? 'fill-[#86BC25] text-[#86BC25] scale-110 rotate-[72deg]'
-                            : 'text-gray-200 group-hover:text-gray-300'
+                        ? 'fill-[#86BC25] text-[#86BC25] scale-110 rotate-[72deg]'
+                        : 'text-gray-200 group-hover:text-gray-300'
                         }`}
                 />
             </button>
@@ -62,7 +62,7 @@ const WriteReview = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFCFD] font-sans flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-[#FDFCFD] font-sans flex flex-col relative overflow-hidden max-w-[440px] mx-auto shadow-2xl shadow-gray-200/50 border-x border-gray-50">
             {/* Liquid Background Decorations */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#FF4D6D]/10 rounded-full blur-[120px] animate-pulse"></div>
@@ -71,14 +71,9 @@ const WriteReview = () => {
 
             {/* Premium Header */}
             <div className="sticky top-0 z-[100] bg-white/80 backdrop-blur-2xl border-b border-gray-100/50 px-6 py-5 flex items-center justify-between shadow-sm">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-400 border border-gray-100 shadow-sm active:scale-90 transition-all hover:text-[#FF4D6D] hover:border-pink-100"
-                >
-                    <ChevronLeft size={24} />
-                </button>
+
                 <div className="text-center">
-                    <h1 className="text-lg font-black text-gray-900 tracking-tighter uppercase">Write Review</h1>
+                    <h1 className="text-2xl font-script text-[#FF4D6D] tracking-tight">Share Your Experience</h1>
                     <div className="flex items-center justify-center gap-1 mt-0.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#86BC25] animate-pulse"></div>
                         <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Premium Content</span>

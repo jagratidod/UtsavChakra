@@ -16,8 +16,12 @@ import {
     Mic2,
     Palette,
     Music,
-    Search
+    Search,
+    ChevronLeft,
+    MessageCircle,
+    Bell
 } from 'lucide-react';
+import MobileNav from '../components/MobileNav';
 
 const CATEGORY_MAP = {
     'wedding-venues': { label: 'Wedding venues', icon: Home },
@@ -79,113 +83,183 @@ const CategoryResults = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [filteredVendors, setFilteredVendors] = useState([]);
+    const [wishlist, setWishlist] = useState([]);
     const categoryInfo = CATEGORY_MAP[id] || { label: 'Search Results', icon: Sparkles };
     const Icon = categoryInfo.icon;
 
     useEffect(() => {
+        const savedWishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+        setWishlist(savedWishlist);
+    }, []);
+
+    const toggleWishlist = (e, vendorId) => {
+        e.stopPropagation();
+        let newWishlist;
+        if (wishlist.includes(vendorId)) {
+            newWishlist = wishlist.filter(id => id !== vendorId);
+        } else {
+            newWishlist = [...wishlist, vendorId];
+        }
+        setWishlist(newWishlist);
+        localStorage.setItem('user_wishlist', JSON.stringify(newWishlist));
+    };
+
+    useEffect(() => {
         const label = categoryInfo.label.toLowerCase();
-        const results = MOCK_VENDORS.filter(v =>
+        const userLocation = localStorage.getItem('user_preference_location') || '';
+        const locationLower = userLocation.toLowerCase();
+
+        // First filter by category
+        let results = MOCK_VENDORS.filter(v =>
             v.category.toLowerCase().includes(label) ||
             v.category.toLowerCase().replace(/-/g, ' ').includes(label) ||
-            id.toLowerCase().replace(/-/g, ' ').includes(v.category.toLowerCase())
+            label.includes(v.category.toLowerCase()) ||
+            (id && id.toLowerCase().replace(/-/g, ' ').includes(v.category.toLowerCase()))
         );
+
+        // Then filter by user's preferred location if available
+        if (locationLower) {
+            const locationFiltered = results.filter(v =>
+                v.location?.toLowerCase().includes(locationLower) ||
+                v.city?.toLowerCase().includes(locationLower) ||
+                locationLower.includes(v.city?.toLowerCase() || '')
+            );
+            // If location filter returns results, use them; otherwise show all category results
+            if (locationFiltered.length > 0) {
+                results = locationFiltered;
+            }
+        }
+
         setFilteredVendors(results);
     }, [id, categoryInfo.label]);
 
     return (
-        <div className="min-h-screen bg-[#FDFCFD] font-sans">
-            {/* Header */}
-            <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 pt-12 pb-6 sticky top-0 z-50">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 active:scale-95 transition-all"
-                    >
-                        <ArrowLeft size={20} />
-                    </button>
-                    <div>
-                        <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none">{categoryInfo.label}</h1>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1.5">{filteredVendors.length} Verified Vendors</p>
-                    </div>
-                    <div className="ml-auto">
-                        <div className="w-10 h-10 rounded-2xl bg-pink-50 flex items-center justify-center text-[#FF4D6D] border border-pink-100 shadow-sm">
-                            <Icon size={20} />
+        <div className="min-h-screen bg-white font-sans flex flex-col pb-32 max-w-[440px] mx-auto shadow-[0_0_50px_rgba(0,0,0,0.05)] border-x border-gray-50 relative">
+            {/* Premium Header */}
+            <div className="bg-[#2D328C] px-5 pt-10 pb-20 rounded-b-[2.5rem] relative overflow-hidden shrink-0 shadow-xl">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div className="absolute top-20 -left-10 w-24 h-24 bg-orange-400/10 rounded-full blur-2xl"></div>
+
+                <div className="relative z-10 flex flex-col gap-6">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-orange-400 border border-white/10 shadow-lg">
+                                <Icon size={20} />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 italic">Browsing</span>
+                                <h1 className="text-sm font-black text-white uppercase tracking-widest italic leading-none">{categoryInfo.label}</h1>
+                            </div>
                         </div>
+                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-ping"></div>
+                        </div>
+                    </div>
+
+                    {/* Compact Integrated Search */}
+                    <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-orange-400 transition-colors" size={14} />
+                        <input
+                            type="text"
+                            placeholder={`Search in ${categoryInfo.label}...`}
+                            className="w-full h-10 bg-white/10 border border-white/10 rounded-xl pl-10 pr-4 text-[11px] font-bold text-white placeholder:text-white/20 outline-none focus:bg-white/20 transition-all font-sans"
+                        />
                     </div>
                 </div>
             </div>
 
-            <div className="p-6 pb-32">
-                {/* Search in Category */}
-                <div className="relative group mb-10">
-                    <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-gray-300">
-                        <Search size={16} />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder={`Search in ${categoryInfo.label}...`}
-                        className="w-full bg-white border border-gray-100 rounded-2xl py-4 pl-12 pr-6 text-xs font-bold shadow-sm focus:border-pink-200 focus:ring-4 focus:ring-pink-500/5 transition-all outline-none"
-                    />
+            {/* Results Section */}
+            <div className="flex-1 px-5 pt-10 space-y-6">
+                <div className="flex justify-between items-center mb-2">
+                    <span className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em]">{filteredVendors.length} Verified Options</span>
                 </div>
 
-                {/* Vendor List */}
-                <div className="space-y-6">
-                    {filteredVendors.length > 0 ? (
-                        filteredVendors.map((vendor) => (
+                {filteredVendors.length > 0 ? (
+                    <div className="space-y-6">
+                        {filteredVendors.map((vendor) => (
                             <div
                                 key={vendor.id}
                                 onClick={() => navigate(`/vendor-details/${vendor.id}`)}
-                                className="bg-white p-5 rounded-[2.8rem] border border-gray-50 shadow-[0_15px_40px_rgba(0,0,0,0.02)] flex gap-6 hover:shadow-2xl hover:shadow-pink-500/5 hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden"
+                                className="group bg-white rounded-[1.8rem] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] transition-all active:scale-[0.98]"
                             >
-                                <div className="w-28 h-28 bg-gray-50 rounded-[2.2rem] overflow-hidden relative shrink-0 shadow-inner border border-gray-100/50">
-                                    <div className="w-full h-full bg-gradient-to-br from-pink-50/50 to-orange-50/50 flex items-center justify-center text-pink-200 group-hover:scale-110 transition-transform duration-500">
-                                        <Icon size={36} />
-                                    </div>
-                                    <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-md px-2 py-1 rounded-xl flex items-center gap-1.5 shadow-sm border border-white">
-                                        <Star size={10} className="fill-[#FF4D6D] text-[#FF4D6D]" />
-                                        <span className="text-[10px] font-black text-gray-900">{vendor.rating}</span>
-                                    </div>
-                                </div>
+                                <div className="relative h-44 overflow-hidden">
+                                    <img src={vendor.coverImage || `https://images.unsplash.com/photo-${vendor.id % 2 === 0 ? '1519167758481-83f550bb49b3' : '1511795409834-ef04bbd61622'}?w=800&q=80`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={vendor.name} />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
 
-                                <div className="flex-1 py-1 flex flex-col">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h4 className="text-lg font-black text-gray-900 group-hover:text-[#FF4D6D] transition-colors line-clamp-1 tracking-tight">{vendor.name}</h4>
-                                        <button className="p-2 -mr-2 text-gray-200 hover:text-[#FF4D6D] transition-colors">
-                                            <Heart size={20} />
-                                        </button>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        <span className="text-[9px] font-black text-[#FF4D6D] bg-pink-50 px-2 py-1 rounded-lg uppercase tracking-wider border border-pink-100">
-                                            {vendor.category}
-                                        </span>
-                                        <div className="flex items-center gap-1 text-[10px] font-bold text-gray-400">
-                                            <MapPin size={12} className="text-gray-300" /> {vendor.location}
+                                    {/* Profile Branding Overlay */}
+                                    <div className="absolute left-4 bottom-4 flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-xl border-2 border-white shadow-xl overflow-hidden bg-white">
+                                            <img src={vendor.profileImage || 'https://i.pravatar.cc/100'} className="w-full h-full object-cover" alt="" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="text-white font-black text-sm tracking-tight uppercase leading-none drop-shadow-md">{vendor.name}</h4>
+                                            <span className="text-white/70 text-[8px] font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1">
+                                                <MapPin size={8} /> {vendor.location}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto border-t border-gray-50 pt-3 flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5">
-                                            <div className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center">
-                                                <Phone size={10} className="text-emerald-500" />
-                                            </div>
-                                            <span className="text-[10px] font-black text-gray-400">CONTACT</span>
+                                    <button
+                                        onClick={(e) => toggleWishlist(e, vendor.id)}
+                                        className={`absolute top-4 right-4 p-2.5 rounded-xl backdrop-blur-md transition-all ${wishlist.includes(vendor.id) ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-white/20 text-white border border-white/20'}`}
+                                    >
+                                        <Heart size={14} fill={wishlist.includes(vendor.id) ? "white" : "none"} />
+                                    </button>
+                                </div>
+
+                                <div className="p-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-[7px] font-black text-gray-300 uppercase tracking-widest leading-none mb-1">Starting from</span>
+                                            <span className="text-[13px] font-black text-[#1E226A]">₹{vendor.packages?.[0]?.price?.toLocaleString() || '10,000'}</span>
                                         </div>
-                                        <span className="text-[10px] font-black text-[#FF4D6D] uppercase tracking-[0.1em]">Details</span>
+                                        <div className="w-[1px] h-6 bg-gray-100"></div>
+                                        <div className="flex items-center gap-1.5 px-2 py-1 bg-orange-50 rounded-lg">
+                                            <Star size={10} className="fill-orange-400 text-orange-400" />
+                                            <span className="text-[10px] font-black text-orange-700">{vendor.rating}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-2">
+                                        <a
+                                            href={`tel:${vendor.phone}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="w-9 h-9 rounded-xl bg-[#2D328C] text-white flex items-center justify-center shadow-md active:scale-90 transition-all"
+                                        >
+                                            <Phone size={14} />
+                                        </a>
+                                        <a
+                                            href={`https://wa.me/${vendor.phone}`}
+                                            target="_blank"
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md active:scale-90 transition-all font-sans"
+                                        >
+                                            <MessageCircle size={14} />
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-gray-50 shadow-inner">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-200 mb-4">
-                                <Search size={40} />
-                            </div>
-                            <p className="text-gray-400 font-black uppercase tracking-widest text-center text-xs">No vendors found in<br />this category yet</p>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-[3rem] border border-gray-100 shadow-inner px-10 text-center">
+                        <div className="w-16 h-16 bg-white rounded-[1.5rem] flex items-center justify-center text-gray-200 mb-6 border border-gray-100">
+                            <Search size={24} />
                         </div>
-                    )}
-                </div>
+                        <h4 className="text-xs font-black text-[#1E226A] uppercase tracking-widest mb-2">No results found</h4>
+                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter leading-relaxed">No vendors match this category yet.<br />Try exploring the general directory.</p>
+                        <button
+                            onClick={() => navigate('/user/vendor-directory')}
+                            className="mt-6 px-8 py-3 bg-[#2D328C] text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-blue-100"
+                        >
+                            Open Directory
+                        </button>
+                    </div>
+                )}
             </div>
+
+            <MobileNav />
         </div>
     );
 };

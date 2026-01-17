@@ -46,19 +46,14 @@ const VendorPortfolio = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFCFD] font-sans">
+        <div className="min-h-screen bg-[#FDFCFD] font-sans pb-20 max-w-[440px] mx-auto shadow-2xl shadow-gray-200/50 border-x border-gray-50 relative">
             {/* Premium Sticky Header */}
-            <div className="fixed top-0 left-0 right-0 z-[60]">
+            <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-[60]">
                 <div className="bg-white/80 backdrop-blur-2xl border-b border-gray-100/50 px-6 py-5 flex items-center justify-between shadow-[0_2px_20px_rgba(0,0,0,0.02)]">
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-[#FF4D6D] hover:text-white transition-all transform hover:-translate-x-1 active:scale-90"
-                        >
-                            <ArrowLeft size={18} strokeWidth={2.5} />
-                        </button>
+
                         <div>
-                            <h1 className="text-lg font-black text-gray-900 tracking-tight leading-none">Photo Gallery</h1>
+                            <h1 className="text-2xl font-script text-[#FF4D6D] tracking-tight leading-none">Photo Gallery</h1>
                             <div className="flex items-center gap-2 mt-1">
                                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                                 <span className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.1em]">Public Portfolio</span>

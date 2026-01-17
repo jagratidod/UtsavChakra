@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ChevronLeft,
+    ChevronRight,
     Camera,
     User,
     Lock,
-    Settings,
+    Settings as SettingsIcon,
     HelpCircle,
     LogOut,
     UserCircle,
-    Home,
-    Heart,
-    Search,
     X,
-    CheckCircle2,
     ShieldCheck,
     Upload,
     Eye,
     EyeOff,
-    Star
+    Star,
+    Mail,
+    MapPin,
+    Heart,
+    ClipboardList,
+    Bell
 } from 'lucide-react';
+import MobileNav from '../components/MobileNav';
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -62,319 +65,162 @@ const UserProfile = () => {
     const handlePasswordChange = (e) => {
         e.preventDefault();
         if (passwords.new !== passwords.confirm) return alert("Passwords don't match!");
-        alert("Password updated successfully!");
+        alert("Password updated!");
         setIsPasswordModalOpen(false);
-        setPasswords({ current: '', new: '', confirm: '' });
     };
 
-    const handleAadharUpload = (e) => {
-        e.preventDefault();
-        if (!aadharImage) return alert("Please select a file!");
-        setUser(prev => ({ ...prev, aadharStatus: 'Verification Pending' }));
-        setIsAadharModalOpen(false);
-        alert("Aadhar uploaded for verification!");
-    };
+    const stats = [
+        { label: 'Bookings', val: '12', icon: ClipboardList, color: 'text-blue-500' },
+        { label: 'Saved', val: '45', icon: Heart, color: 'text-[#FF4D6D]' },
+        { label: 'Reviews', val: '08', icon: Star, color: 'text-orange-400' }
+    ];
 
-    const menuItems = [
+    const menuGroups = [
         {
-            icon: <UserCircle size={22} />,
-            label: 'Account Information',
-            onClick: () => {
-                setTempUser({ ...user });
-                setIsEditModalOpen(true);
-            }
+            title: 'Account',
+            items: [
+                { icon: UserCircle, label: 'Information', onClick: () => { setTempUser({ ...user }); setIsEditModalOpen(true); } },
+                { icon: ShieldCheck, label: 'KYC Status', status: user.aadharStatus, onClick: () => setIsAadharModalOpen(true) },
+                { icon: SettingsIcon, label: 'Preferences', onClick: () => navigate('/user/preferences') },
+            ]
         },
         {
-            icon: <Lock size={22} />,
-            label: 'Password',
-            onClick: () => setIsPasswordModalOpen(true)
-        },
-        {
-            icon: <ShieldCheck size={22} />,
-            label: 'Aadhar Verification',
-            status: user.aadharStatus,
-            onClick: () => setIsAadharModalOpen(true)
-        },
-        {
-            icon: <Star size={22} />,
-            label: 'Write a Review',
-            onClick: () => navigate('/user/write-review')
-        },
-        { icon: <Settings size={22} />, label: 'Settings', onClick: () => alert('Settings menu coming soon!') },
-        { icon: <HelpCircle size={22} />, label: 'Help & Support', onClick: () => alert('Support ticket system coming soon!') },
+            title: 'Settings',
+            items: [
+                { icon: Lock, label: 'Security', onClick: () => setIsPasswordModalOpen(true) },
+                { icon: Bell, label: 'Notifications', onClick: () => alert('Notification settings coming soon!') },
+                { icon: HelpCircle, label: 'Help & Support', onClick: () => alert('For help, contact support@utsavchakra.com') },
+            ]
+        }
     ];
 
     return (
-        <div className="min-h-screen bg-[#FDFCFD] font-sans flex flex-col relative overflow-hidden">
-            {/* Liquid Wave Header */}
-            <div className="relative h-[250px] w-full overflow-hidden">
-                <div
-                    className="absolute inset-x-0 top-0 h-[380px] transition-all duration-700"
-                    style={{
-                        background: '#FF4D6D',
-                        borderRadius: '0 0 50% 50% / 0 0 40% 40%',
-                        transform: 'scaleX(1.5) translateY(-100px)',
-                    }}
-                ></div>
+        <div className="min-h-screen bg-white font-sans flex flex-col pb-24 max-w-[440px] mx-auto shadow-[0_0_50px_rgba(0,0,0,0.05)] border-x border-gray-50 relative">
+            {/* Minimal Header Banner */}
+            <div className="bg-[#2D328C] px-5 pt-10 pb-20 rounded-b-[2.5rem] relative overflow-hidden shrink-0">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
 
-                {/* Back Button */}
-                <div className="absolute top-12 left-6 z-20">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-white/90 hover:text-white transition-colors"
-                    >
-                        <ChevronLeft size={24} />
-                        <span className="text-lg font-bold lowercase tracking-tight">profile</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Profile Center Section */}
-            <div className="relative -mt-32 flex flex-col items-center z-10 px-8">
-                <div className="relative">
-                    <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-100 shadow-2xl overflow-hidden flex items-center justify-center">
-                        {profileImage ? (
-                            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full bg-pink-50 flex items-center justify-center text-pink-200">
-                                <User size={60} />
-                            </div>
-                        )}
-                    </div>
-                    <label className="absolute bottom-1 right-1 bg-white p-2 rounded-full cursor-pointer shadow-lg hover:scale-110 active:scale-95 transition-all text-[#FF4D6D] border border-gray-50">
-                        <Camera size={18} fill="currentColor" className="text-[#FF4D6D] fill-white" />
-                        <input type="file" className="hidden" onChange={(e) => handleImageChange(e, 'profile')} accept="image/*" />
-                    </label>
-                </div>
-
-                <div className="text-center mt-4 mb-8">
-                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">{user.name}</h2>
-                    <div className="flex items-center justify-center gap-2 mt-1">
-                        <ShieldCheck size={14} className={user.aadharStatus === 'Verification Pending' ? 'text-orange-400' : 'text-gray-300'} />
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
-                            {user.aadharStatus}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Menu List */}
-                <div className="w-full space-y-4 max-w-sm mb-32">
-                    {menuItems.map((item, idx) => (
-                        <button
-                            key={idx}
-                            onClick={item.onClick}
-                            className="w-full bg-white border border-gray-100 py-5 px-6 rounded-2xl flex items-center gap-5 group hover:border-[#FF4D6D]/30 hover:shadow-xl hover:shadow-gray-100 transition-all active:scale-[0.98]"
-                        >
-                            <div className="text-gray-300 group-hover:text-[#FF4D6D] transition-colors">
-                                {item.icon}
-                            </div>
-                            <div className="flex-1 text-left">
-                                <span className="text-[15px] font-bold text-gray-600 group-hover:text-gray-900 tracking-tight block">
-                                    {item.label}
-                                </span>
-                                {item.status && (
-                                    <span className={`text-[9px] font-black uppercase tracking-widest ${item.status === 'Verification Pending' ? 'text-orange-500' : 'text-gray-400'}`}>
-                                        {item.status}
-                                    </span>
-                                )}
-                            </div>
-                        </button>
-                    ))}
-
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="w-full bg-white border border-gray-100 py-5 px-6 rounded-2xl flex items-center gap-5 group hover:bg-red-50 hover:border-red-100 transition-all active:scale-[0.98]"
-                    >
-                        <div className="text-gray-300 group-hover:text-red-500 transition-colors">
-                            <LogOut size={22} className="rotate-180" />
+                <div className="relative z-10 flex flex-col gap-6">
+                    <div className="flex justify-between items-center">
+                        <div className="bg-white/10 px-4 py-1.5 rounded-xl border border-white/10 backdrop-blur-md">
+                            <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] italic">PRO Account</span>
                         </div>
-                        <span className="text-[15px] font-bold text-gray-400 group-hover:text-red-500 tracking-tight">
-                            Log out
-                        </span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Bottom Navigation */}
-            <div className="fixed bottom-6 left-6 right-6 z-[60]">
-                <div className="bg-[#FF4D6D] rounded-[2rem] px-8 py-5 flex items-center justify-between shadow-2xl shadow-pink-200">
-                    <button onClick={() => navigate('/user/dashboard')} className="text-white/60 hover:text-white transition-all transform hover:scale-110">
-                        <Home size={24} />
-                    </button>
-                    <button className="text-white/60 hover:text-white transition-all transform hover:scale-110">
-                        <Heart size={24} />
-                    </button>
-                    <button className="text-white/60 hover:text-white transition-all transform hover:scale-110">
-                        <Search size={24} />
-                    </button>
-                    <button className="text-white transition-all transform scale-110">
-                        <User size={24} fill="white" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Edit Profile Modal */}
-            {isEditModalOpen && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[100] flex items-end justify-center">
-                    <div className="bg-white w-full rounded-t-[3rem] p-10 animate-slide-up shadow-2xl overflow-hidden max-h-[90vh]">
-                        <div className="flex items-center justify-between mb-8">
-                            <div>
-                                <h3 className="text-2xl font-black text-gray-900 leading-none">Edit Profile</h3>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Personal information</p>
-                            </div>
-                            <button onClick={() => setIsEditModalOpen(false)} className="w-11 h-11 bg-gray-50 rounded-full flex items-center justify-center text-gray-400">
-                                <X size={20} />
-                            </button>
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
                         </div>
-
-                        <form onSubmit={handleSave} className="space-y-6 pb-10">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">Full Name</label>
-                                <input
-                                    required
-                                    type="text"
-                                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-[#FF4D6D]/10 outline-none"
-                                    value={tempUser.name}
-                                    onChange={(e) => setTempUser({ ...tempUser, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">Email Address</label>
-                                <input
-                                    required
-                                    type="email"
-                                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-[#FF4D6D]/10 outline-none"
-                                    value={tempUser.email}
-                                    onChange={(e) => setTempUser({ ...tempUser, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">Phone Number</label>
-                                <input
-                                    required
-                                    type="text"
-                                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-[#FF4D6D]/10 outline-none"
-                                    value={tempUser.phone}
-                                    onChange={(e) => setTempUser({ ...tempUser, phone: e.target.value })}
-                                />
-                            </div>
-                            <button className="w-full bg-[#FF4D6D] text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-pink-100 flex items-center justify-center gap-3 active:scale-95 transition-all mt-4">
-                                Save Changes <CheckCircle2 size={18} />
-                            </button>
-                        </form>
                     </div>
-                </div>
-            )}
 
-            {/* Change Password Modal */}
-            {isPasswordModalOpen && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[100] flex items-end justify-center">
-                    <div className="bg-white w-full rounded-t-[3rem] p-10 animate-slide-up shadow-2xl max-h-[90vh]">
-                        <div className="flex items-center justify-between mb-8">
-                            <div>
-                                <h3 className="text-2xl font-black text-gray-900 leading-none">Security</h3>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Change your password</p>
-                            </div>
-                            <button onClick={() => setIsPasswordModalOpen(false)} className="w-11 h-11 bg-gray-50 rounded-full flex items-center justify-center text-gray-400">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handlePasswordChange} className="space-y-6 pb-10">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">Current Password</label>
-                                <div className="relative">
-                                    <input
-                                        required
-                                        type={showPassword ? 'text' : 'password'}
-                                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-[#FF4D6D]/10 outline-none"
-                                        value={passwords.current}
-                                        onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300"
-                                    >
-                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">New Password</label>
-                                <input
-                                    required
-                                    type="password"
-                                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-[#FF4D6D]/10 outline-none"
-                                    value={passwords.new}
-                                    onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">Confirm New Password</label>
-                                <input
-                                    required
-                                    type="password"
-                                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-[#FF4D6D]/10 outline-none"
-                                    value={passwords.confirm}
-                                    onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                                />
-                            </div>
-                            <button className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-all mt-4">
-                                Update Password <Lock size={18} />
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Aadhar Upload Modal */}
-            {isAadharModalOpen && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[100] flex items-end justify-center">
-                    <div className="bg-white w-full rounded-t-[3rem] p-10 animate-slide-up shadow-2xl max-h-[90vh]">
-                        <div className="flex items-center justify-between mb-8">
-                            <div>
-                                <h3 className="text-2xl font-black text-gray-900 leading-none">KYC Upload</h3>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Verify your identity</p>
-                            </div>
-                            <button onClick={() => setIsAadharModalOpen(false)} className="w-11 h-11 bg-gray-50 rounded-full flex items-center justify-center text-gray-400">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <div className="space-y-8 pb-10">
-                            <label className="relative block w-full aspect-video rounded-[2.5rem] border-2 border-dashed border-gray-100 bg-gray-50 hover:bg-white hover:border-[#FF4D6D] transition-all overflow-hidden shadow-inner cursor-pointer group">
-                                {aadharImage ? (
-                                    <img src={aadharImage} alt="Aadhar Preview" className="w-full h-full object-cover" />
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <div className="w-16 h-16 rounded-[1.2rem] border-2 border-white/20 overflow-hidden bg-white/5 p-0.5">
+                                {profileImage ? (
+                                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover rounded-[1rem]" />
                                 ) : (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300 group-hover:text-[#FF4D6D]">
-                                        <Upload size={40} className="mb-3" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Upload Aadhar Card</span>
-                                        <p className="text-[8px] font-bold mt-2">JPG, PNG OR PDF (MAX 5MB)</p>
+                                    <div className="w-full h-full bg-[#1E226A] flex items-center justify-center text-white rounded-[1rem]">
+                                        <User size={24} />
                                     </div>
                                 )}
-                                <input type="file" className="hidden" onChange={(e) => handleImageChange(e, 'aadhar')} accept="image/*" />
-                            </label>
-
-                            <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100/50">
-                                <div className="flex gap-4">
-                                    <ShieldCheck className="text-orange-400 shrink-0" size={24} />
-                                    <p className="text-[11px] font-bold text-orange-700 leading-relaxed uppercase tracking-tight">
-                                        Verification helps in building trust with vendors and enables instant booking privileges on Utsav Chakra.
-                                    </p>
-                                </div>
                             </div>
-
-                            <button
-                                onClick={handleAadharUpload}
-                                className="w-full bg-[#FF4D6D] text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-pink-100 flex items-center justify-center gap-3 active:scale-95 transition-all mt-4"
-                            >
-                                Submit for Verification <CheckCircle2 size={18} />
-                            </button>
+                            <label className="absolute -bottom-1 -right-1 bg-orange-500 text-white p-1.5 rounded-lg cursor-pointer border-2 border-[#2D328C]">
+                                <Camera size={10} />
+                                <input type="file" className="hidden" onChange={(e) => handleImageChange(e, 'profile')} accept="image/*" />
+                            </label>
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="text-white font-black text-[15px] tracking-tight uppercase leading-none">{user.name}</h2>
+                            <div className="flex items-center gap-2 mt-2 opacity-50">
+                                <Mail size={10} className="text-white" />
+                                <span className="text-[8px] font-bold text-white uppercase tracking-widest">{user.email}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Compact Quick Stats */}
+            <div className="px-5 -mt-8 relative z-20">
+                <div className="bg-white rounded-[1.5rem] p-4 shadow-xl shadow-blue-900/5 grid grid-cols-3 border border-gray-100 divide-x divide-gray-50">
+                    {stats.map((s, idx) => (
+                        <div key={idx} className="flex flex-col items-center justify-center group active:scale-95 transition-all">
+                            <span className="text-xs font-black text-[#2D328C]">{s.val}</span>
+                            <span className="text-[7px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{s.label}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Lean Menu List */}
+            <div className="px-5 py-8 space-y-8">
+                {menuGroups.map((group, gIdx) => (
+                    <div key={gIdx} className="space-y-3">
+                        <h3 className="text-[8px] font-black text-[#1E226A] uppercase tracking-[0.2em] pl-1 opacity-20">{group.title}</h3>
+                        <div className="bg-gray-50/50 rounded-[1.5rem] p-1.5 border border-gray-50/50">
+                            {group.items.map((item, iIdx) => (
+                                <button
+                                    key={iIdx}
+                                    onClick={item.onClick}
+                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white hover:shadow-sm transition-all group active:scale-[0.99]"
+                                >
+                                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 group-hover:text-[#2D328C] transition-colors border border-gray-100">
+                                        <item.icon size={14} />
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <span className="text-[11px] font-bold text-[#1E226A] uppercase tracking-tight">{item.label}</span>
+                                        {item.status && (
+                                            <span className={`text-[7px] font-black uppercase tracking-tighter mt-1 block ${item.status === 'Verified' ? 'text-emerald-500' : 'text-orange-400'}`}>
+                                                {item.status}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <ChevronRight size={14} className="text-gray-300 group-hover:translate-x-0.5 transition-all" />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
+                {/* Secure Logout Compact */}
+                <button
+                    onClick={() => navigate('/login')}
+                    className="w-full border border-red-100 p-4 rounded-[1.5rem] flex items-center justify-between group active:scale-[0.98] transition-all bg-red-50/20"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-red-500 border border-red-50 shadow-sm">
+                            <LogOut size={14} className="rotate-180" />
+                        </div>
+                        <span className="text-[11px] font-black text-red-600 uppercase tracking-widest">Logout Session</span>
+                    </div>
+                    <ChevronRight size={14} className="text-red-200" />
+                </button>
+            </div>
+
+            {/* Compact Modals */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[200] flex items-end justify-center px-4 pb-4">
+                    <div className="bg-white w-full max-w-[400px] rounded-[2rem] p-6 animate-in slide-in-from-bottom-5 shadow-2xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xs font-black text-[#1E226A] uppercase tracking-widest italic">Update Info</h3>
+                            <button onClick={() => setIsEditModalOpen(false)} className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400"><X size={16} /></button>
+                        </div>
+                        <form onSubmit={handleSave} className="space-y-4">
+                            {['name', 'email', 'phone'].map((k) => (
+                                <div key={k} className="space-y-1.5">
+                                    <label className="text-[8px] font-black uppercase text-gray-300 tracking-[0.2em] pl-1">{k}</label>
+                                    <input
+                                        required
+                                        className="w-full h-10 bg-gray-50 rounded-xl px-4 text-[11px] font-bold text-[#1E226A] border border-gray-100 focus:bg-white outline-none"
+                                        value={tempUser[k]}
+                                        onChange={(e) => setTempUser({ ...tempUser, [k]: e.target.value })}
+                                    />
+                                </div>
+                            ))}
+                            <button className="w-full bg-[#2D328C] text-white py-3.5 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] mt-2 active:scale-95 transition-all">Confirm</button>
+                        </form>
+                    </div>
+                </div>
             )}
+
+            <MobileNav />
         </div>
     );
 };

@@ -9,13 +9,24 @@ import {
     Zap,
     ChevronRight,
     Sparkles,
-    Trash2
+    Trash2,
+    AlertTriangle
 } from 'lucide-react';
 
 const VendorNotifications = () => {
     const navigate = useNavigate();
 
     const notifications = [
+        {
+            id: 0,
+            type: 'sos',
+            title: 'URGENT: CUSTOMER SOS',
+            message: 'Priya Sharma needs "Extra Catering for 50" at Banjara Hills within 1 hour.',
+            time: 'JUST NOW',
+            icon: AlertTriangle,
+            color: 'bg-red-100 text-red-600 animate-pulse',
+            path: '/vendor/emergency-hub'
+        },
         {
             id: 1,
             type: 'event',
@@ -55,14 +66,12 @@ const VendorNotifications = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#FDFCFD] flex flex-col font-sans">
+        <div className="min-h-screen bg-[#FDFCFD] flex flex-col font-sans max-w-[440px] mx-auto shadow-2xl shadow-gray-200/50 border-x border-gray-50 relative">
             {/* Header */}
             <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 py-5 sticky top-0 z-50 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-800 hover:bg-gray-50 rounded-full transition-all">
-                        <ArrowLeft size={24} />
-                    </button>
-                    <h1 className="text-xl font-black text-gray-900 tracking-tight">Notifications</h1>
+
+                    <h1 className="text-2xl font-script text-[#FF4D6D] tracking-tight">Recent Alerts</h1>
                 </div>
                 <button className="text-gray-400 hover:text-[#FF4D6D] p-2 transition-colors">
                     <Trash2 size={20} />
@@ -91,6 +100,7 @@ const VendorNotifications = () => {
                         return (
                             <div
                                 key={notif.id}
+                                onClick={() => notif.path ? navigate(notif.path) : null}
                                 className="bg-white p-5 rounded-[2rem] border border-gray-50 shadow-sm flex gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
                             >
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${notif.color}`}>

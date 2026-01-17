@@ -26,93 +26,93 @@ const UserRegister = () => {
     };
 
     return (
-        <div className="min-h-screen w-full relative flex flex-col items-center justify-center overflow-hidden font-sans py-10">
-            <div
-                className="absolute inset-0 z-0"
-                style={{
-                    backgroundImage: `url(${frontImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-            >
-                <div className="absolute inset-0 bg-white/70 backdrop-blur-[3px]"></div>
-            </div>
-
-            <div className="absolute top-6 left-6 z-20">
-                <button
-                    onClick={() => navigate('/user/entry')}
-                    className="text-[#FF4D6D] hover:text-[#FF2E56] transition-all p-2 rounded-full hover:bg-[#FF4D6D]/10 active:scale-90"
+        <div className="min-h-screen bg-[#FFF5F7] flex flex-col items-center overflow-x-hidden font-sans max-w-[440px] mx-auto shadow-2xl shadow-pink-100/50 border-x border-white relative">
+            {/* Top Image Section with Premium 'Melt' Fade */}
+            <div className="w-full h-[45vh] relative shrink-0 overflow-hidden">
+                <div
+                    className="absolute inset-0 bg-cover bg-center scale-105"
+                    style={{ backgroundImage: `url(${frontImage})` }}
                 >
-                    <ArrowLeft size={28} strokeWidth={2.5} />
-                </button>
-            </div>
-
-            <div className="relative z-10 w-full max-w-md px-8 py-10 flex flex-col items-center bg-white/40 rounded-[2.5rem] border border-white/50 shadow-2xl mx-4">
-                <div className="w-16 h-16 mb-4 p-1 rounded-full border-2 border-[#FF4D6D] shadow-lg bg-white">
-                    <img src={logo} alt="Utsav Chakra" className="w-full h-full object-contain rounded-full" />
+                    {/* Deep Melting Gradients */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFF5F7]/30 to-[#FFF5F7]"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FFF5F7] opacity-90"></div>
                 </div>
-
-                <h2 className="text-3xl font-script text-[#FF4D6D] mb-6">User Registration</h2>
-
-                <form onSubmit={handleSubmit} className="w-full space-y-4">
-                    <Input
-                        id="name"
-                        type="text"
-                        label="Full Name"
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="bg-white/80 border-gray-200 focus:border-[#FF4D6D] rounded-2xl"
-                    />
-
-                    <Input
-                        id="phone"
-                        type="tel"
-                        label="Phone Number"
-                        placeholder="+91 98765 43210"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="bg-white/80 border-gray-200 focus:border-[#FF4D6D] rounded-2xl"
-                    />
-
-                    <Input
-                        id="email"
-                        type="email"
-                        label="Email-ID"
-                        placeholder="user@example.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="bg-white/80 border-gray-200 focus:border-[#FF4D6D] rounded-2xl"
-                    />
-
-                    <Input
-                        id="password"
-                        type="password"
-                        label="Password"
-                        placeholder="••••••••"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="bg-white/80 border-gray-200 focus:border-[#FF4D6D] rounded-2xl"
-                    />
-
-                    <button
-                        type="submit"
-                        className="w-full py-4 text-lg font-bold text-white rounded-full shadow-lg transform transition-all active:scale-95 hover:shadow-xl mt-4"
-                        style={{
-                            background: 'linear-gradient(90deg, #FF5E7E 0%, #FF2E56 100%)',
-                        }}
-                    >
-                        REGISTER
-                    </button>
-                </form>
-
-                <p className="text-sm text-gray-600 text-center font-medium mt-6">
-                    Already have an account? {' '}
-                    <Link to="/user/login-form" className="text-[#FF8540] font-bold hover:underline">
-                        Login Here
-                    </Link>
-                </p>
             </div>
+
+            {/* Form Container */}
+            <div className="w-full max-w-md px-6 -mt-32 relative z-20 pb-20">
+                <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white/10">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-script text-[#FF4D6D]">Join Utsav Chakra</h2>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Create your account to start planning</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <Input
+                            id="name"
+                            type="text"
+                            label="Full Name"
+                            placeholder="John Doe"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="bg-gray-50/50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-pink-50 rounded-2xl py-4"
+                        />
+
+                        <Input
+                            id="phone"
+                            type="tel"
+                            label="Phone Number"
+                            placeholder="+91 98765 43210"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="bg-gray-50/50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-pink-50 rounded-2xl py-4"
+                        />
+
+                        <Input
+                            id="email"
+                            type="email"
+                            label="Email Address"
+                            placeholder="your@email.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="bg-gray-50/50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-pink-50 rounded-2xl py-4"
+                        />
+
+                        <Input
+                            id="password"
+                            type="password"
+                            label="Password"
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="bg-gray-50/50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-pink-50 rounded-2xl py-4"
+                        />
+
+                        <button
+                            type="submit"
+                            className="w-full py-5 text-sm font-black text-white rounded-2xl shadow-xl shadow-pink-200/50 transform transition-all active:scale-[0.98] uppercase tracking-[0.2em] mt-4"
+                            style={{
+                                background: 'linear-gradient(90deg, #FF5C8B 0%, #FF3D67 100%)',
+                            }}
+                        >
+                            Sign Up
+                        </button>
+                    </form>
+
+                    <div className="mt-10 text-center">
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-wide">
+                            Already have an account? {' '}
+                            <Link to="/user/login-form" className="text-[#FF4D6D] border-b-2 border-pink-100">
+                                Log In
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Subtle Decorations */}
+            <div className="fixed -bottom-20 -left-20 w-80 h-80 bg-pink-50/50 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+            <div className="fixed -bottom-20 -right-20 w-80 h-80 bg-orange-50/50 rounded-full blur-[100px] pointer-events-none -z-10"></div>
         </div>
     );
 };

@@ -8,6 +8,7 @@ import VendorPortfolio from './modules/vendor/pages/VendorPortfolio.jsx';
 import VendorSchedule from './modules/vendor/pages/VendorSchedule.jsx';
 import VendorNotifications from './modules/vendor/pages/VendorNotifications.jsx';
 import VendorMessages from './modules/vendor/pages/VendorMessages.jsx';
+import EmergencyHub from './modules/vendor/pages/EmergencyHub.jsx';
 
 import UserLoginSplash from './modules/user/pages/UserLoginSplash.jsx';
 import UserLoginForm from './modules/user/pages/UserLoginForm.jsx';
@@ -22,10 +23,13 @@ import Wishlist from './modules/user/pages/Wishlist.jsx';
 import WriteReview from './modules/user/pages/WriteReview.jsx';
 import UserPortfolio from './modules/user/pages/UserPortfolio.jsx';
 import UserMessages from './modules/user/pages/UserMessages.jsx';
+import UserPlanner from './modules/user/pages/UserPlanner.jsx';
+import UserEmergencyRequest from './modules/user/pages/UserEmergencyRequest.jsx';
 
 import Home from './modules/shared/pages/Home.jsx';
 import AdminLogin from './modules/admin/pages/AdminLogin.jsx';
 import VendorDetails from './modules/shared/pages/VendorDetails.jsx';
+import ForgotPassword from './modules/shared/pages/auth/ForgotPassword.jsx';
 
 function App() {
   return (
@@ -44,6 +48,8 @@ function App() {
         <Route path="/vendor/schedule" element={<VendorSchedule />} />
         <Route path="/vendor/notifications" element={<VendorNotifications />} />
         <Route path="/vendor/messages" element={<VendorMessages />} />
+        <Route path="/vendor/emergency-hub" element={<EmergencyHub />} />
+        <Route path="/vendor/forgot-password" element={<ForgotPassword />} />
 
         {/* User Routes */}
         <Route path="/user/login" element={<UserLoginSplash />} />
@@ -60,6 +66,9 @@ function App() {
         <Route path="/user/write-review" element={<WriteReview />} />
         <Route path="/user/gallery" element={<UserPortfolio />} />
         <Route path="/user/messages" element={<UserMessages />} />
+        <Route path="/user/planner" element={<UserPlanner />} />
+        <Route path="/user/sos-request" element={<UserEmergencyRequest />} />
+        <Route path="/user/forgot-password" element={<ForgotPassword />} />
 
         {/* Shared / Dynamic Routes */}
         <Route path="/vendor-details/:id" element={<VendorDetails />} />
