@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+    --color-brand-pink: #EB5E68;
+    /* Vibrant Coral from Groom's suit */
+    --color-brand-light-pink: #FDF2F4;
+    /* Soft blush background */
+    --color-brand-dark-pink: #D13D4B;
+    /* Deep crimson from hearts */
+
+    --font-serif: "Playfair Display", serif;
+    --font-sans: "Poppins", sans-serif;
+    --font-script: "Great Vibes", cursive;
+
+    --shadow-premium: 0 10px 30px -5px rgba(235, 94, 104, 0.3);
+}
+
+@layer base {
+    body {
+        @apply font-sans bg-brand-light-pink text-slate-800;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-serif;
+    }
+}
+
+@layer components {
+    .btn-premium {
+        @apply px-8 py-3 rounded-full bg-brand-pink text-white font-medium transition-all duration-300 hover:bg-brand-dark-pink hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+    }
+
+    .glass-card {
+        @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-3xl shadow-premium;
+    }
+
+    .input-field {
+        @apply w-full px-5 py-4 rounded-2xl bg-white border border-pink-100 focus:outline-none focus:ring-2 focus:ring-brand-pink/20 focus:border-brand-pink transition-all duration-200;
+    }
+}
+
+/* Custom animations */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Splash Scrollbar Hidden */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
