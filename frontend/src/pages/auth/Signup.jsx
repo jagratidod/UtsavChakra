@@ -8,7 +8,7 @@ const Signup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        navigate('/login');
+        navigate('/user/create-event');
     };
 
     return (
