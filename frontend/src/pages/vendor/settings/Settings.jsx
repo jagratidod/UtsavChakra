@@ -1,53 +1,62 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useVendor } from '../../../context/VendorContext';
 import {
-    ArrowLeft, Lock, Bell, Eye, EyeOff, Shield, LogOut,
-    ChevronRight, ToggleLeft, ToggleRight, AlertTriangle
+    ArrowLeft, Bell, Lock, Shield, ChevronRight,
+    LogOut, Trash2, X, AlertTriangle, Eye, EyeOff
 } from 'lucide-react';
 
 const VendorSettings = () => {
     const navigate = useNavigate();
-
-    const [settings, setSettings] = useState({
-        emailNotifications: true,
-        pushNotifications: true,
-        smsNotifications: false,
-        newRequestAlerts: true,
-        paymentAlerts: true,
-        reviewAlerts: true,
-        marketingEmails: false
-    });
+    const {
+        settings,
+        updateSettings,
+        logoutVendor,
+        showToast
+    } = useVendor();
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+
+    // Password Form State
     const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
     const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
 
-    const toggleSetting = (key) => {
-        setSettings({ ...settings, [key]: !settings[key] });
+    // Toggle Notification Preferences
+    const handleToggle = (key) => {
+        updateSettings(key, !settings[key]);
     };
 
     const handlePasswordChange = (e) => {
         e.preventDefault();
-        console.log('Changing password:', passwordForm);
+        if (passwordForm.new !== passwordForm.confirm) {
+            showToast('Passwords do not match', 'error');
+            return;
+        }
+        // In a real app, verify current password here
+        showToast('Password updated successfully', 'success');
         setShowPasswordModal(false);
         setPasswordForm({ current: '', new: '', confirm: '' });
     };
 
     const handleDeactivate = () => {
-        console.log('Deactivating account');
-        navigate('/vendor');
+        // In a real app, this would call an API
+        showToast('Account deactivated', 'info');
+        logoutVendor();
+        navigate('/vendor/login');
     };
 
-    const ToggleSwitch = ({ enabled, onToggle }) => (
-        <button onClick={onToggle} className="transition-colors">
-            {enabled ? (
-                <ToggleRight className="w-10 h-6 text-brand-pink" />
-            ) : (
-                <ToggleLeft className="w-10 h-6 text-slate-300" />
-            )}
-        </button>
-    );
+    const notificationSettings = [
+        { key: 'emailNotifications', label: 'Email Notifications', desc: 'Receive updates via email' },
+        { key: 'pushNotifications', label: 'Push Notifications', desc: 'Receive updates on your device' },
+        { key: 'smsNotifications', label: 'SMS Notifications', desc: 'Receive updates via SMS' }
+    ];
+
+    const alertSettings = [
+        { key: 'newRequestAlerts', label: 'New Requests', desc: 'When a client sends a request' },
+        { key: 'paymentAlerts', label: 'Payments', desc: 'When a payment is received' },
+        { key: 'reviewAlerts', label: 'Reviews', desc: 'When a client writes a review' }
+    ];
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans pb-8">
@@ -62,207 +71,171 @@ const VendorSettings = () => {
                     </button>
                     <div>
                         <h1 className="text-xl font-serif font-bold text-slate-800">Settings</h1>
-                        <p className="text-xs text-slate-400">Manage your account preferences</p>
+                        <p className="text-xs text-slate-400">Manage account preferences</p>
                     </div>
                 </div>
             </header>
 
             <main className="p-6 space-y-6">
                 {/* Security Section */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100">
-                        <h3 className="font-serif font-bold text-slate-800 flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-brand-pink" />
-                            Security
-                        </h3>
+                <section>
+                    <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 ml-1">Security</h2>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <button
+                            onClick={() => setShowPasswordModal(true)}
+                            className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                    <Lock className="w-5 h-5" />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="font-semibold text-slate-800 text-sm">Change Password</h3>
+                                    <p className="text-xs text-slate-400">Update your account password</p>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-slate-300" />
+                        </button>
                     </div>
-                    <button
-                        onClick={() => setShowPasswordModal(true)}
-                        className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                                <Lock className="w-5 h-5 text-slate-600" />
-                            </div>
-                            <div className="text-left">
-                                <p className="font-medium text-slate-800 text-sm">Change Password</p>
-                                <p className="text-xs text-slate-400">Update your account password</p>
-                            </div>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-slate-300" />
-                    </button>
-                </div>
+                </section>
 
                 {/* Notifications Section */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100">
-                        <h3 className="font-serif font-bold text-slate-800 flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-brand-pink" />
-                            Notification Preferences
-                        </h3>
-                    </div>
-
-                    <div className="divide-y divide-slate-50">
-                        <div className="p-4 flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-slate-800 text-sm">Email Notifications</p>
-                                <p className="text-xs text-slate-400">Receive updates via email</p>
+                <section>
+                    <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 ml-1">General Notifications</h2>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                        {notificationSettings.map((item) => (
+                            <div key={item.key} className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${settings[item.key] ? 'bg-brand-pink/10 text-brand-pink' : 'bg-slate-100 text-slate-400'
+                                        }`}>
+                                        <Bell className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800 text-sm">
+                                            {item.label}
+                                        </h3>
+                                        <p className="text-xs text-slate-400">{item.desc}</p>
+                                    </div>
+                                </div>
+                                <div
+                                    onClick={() => handleToggle(item.key)}
+                                    className={`w-12 h-7 rounded-full p-1 cursor-pointer transition-colors duration-300 ${settings[item.key] ? 'bg-brand-pink' : 'bg-slate-200'
+                                        }`}
+                                >
+                                    <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${settings[item.key] ? 'translate-x-5' : 'translate-x-0'
+                                        }`} />
+                                </div>
                             </div>
-                            <ToggleSwitch enabled={settings.emailNotifications} onToggle={() => toggleSetting('emailNotifications')} />
-                        </div>
+                        ))}
+                    </div>
+                </section>
 
-                        <div className="p-4 flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-slate-800 text-sm">Push Notifications</p>
-                                <p className="text-xs text-slate-400">In-app notifications</p>
+                {/* Alert Types Section */}
+                <section>
+                    <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 ml-1">Alert Preferences</h2>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                        {alertSettings.map((item) => (
+                            <div key={item.key} className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${settings[item.key] ? 'bg-indigo-50 text-indigo-500' : 'bg-slate-100 text-slate-400'
+                                        }`}>
+                                        <AlertTriangle className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800 text-sm">
+                                            {item.label}
+                                        </h3>
+                                        <p className="text-xs text-slate-400">{item.desc}</p>
+                                    </div>
+                                </div>
+                                <div
+                                    onClick={() => handleToggle(item.key)}
+                                    className={`w-12 h-7 rounded-full p-1 cursor-pointer transition-colors duration-300 ${settings[item.key] ? 'bg-indigo-500' : 'bg-slate-200'
+                                        }`}
+                                >
+                                    <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${settings[item.key] ? 'translate-x-5' : 'translate-x-0'
+                                        }`} />
+                                </div>
                             </div>
-                            <ToggleSwitch enabled={settings.pushNotifications} onToggle={() => toggleSetting('pushNotifications')} />
-                        </div>
-
-                        <div className="p-4 flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-slate-800 text-sm">SMS Alerts</p>
-                                <p className="text-xs text-slate-400">Get SMS for important updates</p>
-                            </div>
-                            <ToggleSwitch enabled={settings.smsNotifications} onToggle={() => toggleSetting('smsNotifications')} />
-                        </div>
+                        ))}
                     </div>
-                </div>
-
-                {/* Alert Types */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100">
-                        <h3 className="font-medium text-slate-800 text-sm">Alert Types</h3>
-                    </div>
-
-                    <div className="divide-y divide-slate-50">
-                        <div className="p-4 flex items-center justify-between">
-                            <p className="text-sm text-slate-600">New Request Alerts</p>
-                            <ToggleSwitch enabled={settings.newRequestAlerts} onToggle={() => toggleSetting('newRequestAlerts')} />
-                        </div>
-
-                        <div className="p-4 flex items-center justify-between">
-                            <p className="text-sm text-slate-600">Payment Alerts</p>
-                            <ToggleSwitch enabled={settings.paymentAlerts} onToggle={() => toggleSetting('paymentAlerts')} />
-                        </div>
-
-                        <div className="p-4 flex items-center justify-between">
-                            <p className="text-sm text-slate-600">Review Alerts</p>
-                            <ToggleSwitch enabled={settings.reviewAlerts} onToggle={() => toggleSetting('reviewAlerts')} />
-                        </div>
-
-                        <div className="p-4 flex items-center justify-between">
-                            <p className="text-sm text-slate-600">Marketing Emails</p>
-                            <ToggleSwitch enabled={settings.marketingEmails} onToggle={() => toggleSetting('marketingEmails')} />
-                        </div>
-                    </div>
-                </div>
+                </section>
 
                 {/* Danger Zone */}
-                <div className="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
-                    <div className="p-4 border-b border-red-100 bg-red-50">
-                        <h3 className="font-serif font-bold text-red-700 flex items-center gap-2">
-                            <AlertTriangle className="w-5 h-5" />
-                            Danger Zone
-                        </h3>
+                <section>
+                    <h2 className="text-sm font-bold text-red-500 uppercase tracking-wider mb-3 ml-1">Danger Zone</h2>
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <button
+                            onClick={() => logoutVendor()}
+                            className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors border-b border-slate-50"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                                    <LogOut className="w-5 h-5" />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="font-semibold text-slate-800 text-sm">Log Out</h3>
+                                    <p className="text-xs text-slate-400">Sign out of your account</p>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-slate-300" />
+                        </button>
+                        <button
+                            onClick={() => setShowDeactivateModal(true)}
+                            className="w-full p-4 flex items-center justify-between hover:bg-red-50 transition-colors group"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center group-hover:bg-red-100">
+                                    <Trash2 className="w-5 h-5" />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="font-semibold text-red-600 text-sm">Deactivate Account</h3>
+                                    <p className="text-xs text-red-400">Temporarily disable account</p>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-red-200" />
+                        </button>
                     </div>
-
-                    <button
-                        onClick={() => setShowDeactivateModal(true)}
-                        className="w-full p-4 flex items-center justify-between hover:bg-red-50 transition-colors"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                                <LogOut className="w-5 h-5 text-red-600" />
-                            </div>
-                            <div className="text-left">
-                                <p className="font-medium text-red-700 text-sm">Deactivate Account</p>
-                                <p className="text-xs text-red-400">Temporarily disable your profile</p>
-                            </div>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-red-300" />
-                    </button>
-                </div>
+                </section>
             </main>
 
-            {/* Change Password Modal */}
+            {/* Password Modal */}
             {showPasswordModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] p-6 animate-in slide-in-from-bottom duration-300">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
+                    <div className="bg-white w-full max-w-sm rounded-2xl p-6 animate-in zoom-in duration-200">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-serif font-bold text-slate-800">Change Password</h3>
-                            <button
-                                onClick={() => setShowPasswordModal(false)}
-                                className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"
-                            >
-                                ✕
+                            <h3 className="font-serif font-bold text-slate-800">Change Password</h3>
+                            <button onClick={() => setShowPasswordModal(false)}>
+                                <X className="w-5 h-5 text-slate-400" />
                             </button>
                         </div>
-
                         <form onSubmit={handlePasswordChange} className="space-y-4">
-                            <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Current Password</label>
-                                <div className="relative">
-                                    <input
-                                        type={showPasswords.current ? 'text' : 'password'}
-                                        value={passwordForm.current}
-                                        onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
-                                        className="w-full px-4 py-3 pr-12 rounded-xl bg-slate-50 border border-slate-200 focus:border-brand-pink outline-none"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
-                                    >
-                                        {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                    </button>
+                            {['current', 'new', 'confirm'].map((field) => (
+                                <div key={field}>
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">
+                                        {field === 'confirm' ? 'Confirm Password' : `${field} Password`}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type={showPasswords[field] ? "text" : "password"}
+                                            value={passwordForm[field]}
+                                            onChange={(e) => setPasswordForm({ ...passwordForm, [field]: e.target.value })}
+                                            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-brand-pink outline-none"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPasswords({ ...showPasswords, [field]: !showPasswords[field] })}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        >
+                                            {showPasswords[field] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">New Password</label>
-                                <div className="relative">
-                                    <input
-                                        type={showPasswords.new ? 'text' : 'password'}
-                                        value={passwordForm.new}
-                                        onChange={(e) => setPasswordForm({ ...passwordForm, new: e.target.value })}
-                                        className="w-full px-4 py-3 pr-12 rounded-xl bg-slate-50 border border-slate-200 focus:border-brand-pink outline-none"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
-                                    >
-                                        {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Confirm Password</label>
-                                <div className="relative">
-                                    <input
-                                        type={showPasswords.confirm ? 'text' : 'password'}
-                                        value={passwordForm.confirm}
-                                        onChange={(e) => setPasswordForm({ ...passwordForm, confirm: e.target.value })}
-                                        className="w-full px-4 py-3 pr-12 rounded-xl bg-slate-50 border border-slate-200 focus:border-brand-pink outline-none"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
-                                    >
-                                        {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                    </button>
-                                </div>
-                            </div>
-
+                            ))}
                             <button
                                 type="submit"
-                                className="w-full py-4 rounded-xl bg-brand-pink text-white font-bold text-sm shadow-lg shadow-brand-pink/30"
+                                className="w-full py-3 rounded-xl bg-brand-pink text-white font-bold text-sm shadow-lg shadow-brand-pink/30 hover:shadow-brand-pink/50 transition-all mt-2"
                             >
                                 Update Password
                             </button>
@@ -275,14 +248,15 @@ const VendorSettings = () => {
             {showDeactivateModal && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
                     <div className="bg-white w-full max-w-sm rounded-2xl p-6 animate-in zoom-in duration-200">
-                        <div className="text-center mb-6">
-                            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                        <div className="flex items-center justify-center mb-4 text-red-500">
+                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                <AlertTriangle className="w-8 h-8" />
                             </div>
-                            <h3 className="text-lg font-serif font-bold text-slate-800 mb-2">Deactivate Account?</h3>
-                            <p className="text-sm text-slate-500">Your profile will be hidden from users. You can reactivate anytime by logging in.</p>
                         </div>
-
+                        <h3 className="text-center font-serif font-bold text-slate-800 text-xl mb-2">Are you sure?</h3>
+                        <p className="text-center text-sm text-slate-500 mb-6">
+                            This will disable your account and hide your profile from all users. You can reactivate it anytime by logging in.
+                        </p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowDeactivateModal(false)}
@@ -292,7 +266,7 @@ const VendorSettings = () => {
                             </button>
                             <button
                                 onClick={handleDeactivate}
-                                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm"
+                                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm shadow-lg shadow-red-500/30"
                             >
                                 Deactivate
                             </button>

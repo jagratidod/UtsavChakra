@@ -1,103 +1,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useVendor } from '../../../context/VendorContext';
 import {
-    ArrowLeft, Search, Filter, Calendar, MapPin, IndianRupee,
+    ArrowLeft, Search, Calendar, MapPin, IndianRupee,
     Clock, CheckCircle2, XCircle, RefreshCw, ChevronRight, Users
 } from 'lucide-react';
 
 const VendorRequests = () => {
     const navigate = useNavigate();
+    const { requests } = useVendor();
     const [activeFilter, setActiveFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Mock requests data
-    const allRequests = [
-        {
-            id: 1,
-            eventName: "Sharma Wedding Reception",
-            eventType: "Wedding",
-            date: "2026-02-15",
-            time: "6:00 PM",
-            location: "Mumbai, Maharashtra",
-            category: "Decoration",
-            budget: "₹2,00,000 - ₹3,00,000",
-            status: "pending",
-            userName: "Priya Sharma",
-            guestCount: 500,
-            createdAt: "2026-01-22"
-        },
-        {
-            id: 2,
-            eventName: "Rahul's 25th Birthday",
-            eventType: "Birthday Party",
-            date: "2026-02-10",
-            time: "7:00 PM",
-            location: "Pune, Maharashtra",
-            category: "Photography",
-            budget: "₹50,000 - ₹80,000",
-            status: "accepted",
-            userName: "Rahul Verma",
-            guestCount: 100,
-            createdAt: "2026-01-20"
-        },
-        {
-            id: 3,
-            eventName: "Gupta Golden Anniversary",
-            eventType: "Anniversary",
-            date: "2026-02-20",
-            time: "12:00 PM",
-            location: "Delhi NCR",
-            category: "Catering",
-            budget: "₹1,00,000 - ₹1,50,000",
-            status: "pending",
-            userName: "Ankit Gupta",
-            guestCount: 200,
-            createdAt: "2026-01-23"
-        },
-        {
-            id: 4,
-            eventName: "Mehta Engagement",
-            eventType: "Engagement",
-            date: "2026-02-05",
-            time: "5:00 PM",
-            location: "Ahmedabad, Gujarat",
-            category: "Decoration",
-            budget: "₹75,000 - ₹1,00,000",
-            status: "rejected",
-            userName: "Sneha Mehta",
-            guestCount: 150,
-            createdAt: "2026-01-18"
-        },
-        {
-            id: 5,
-            eventName: "Singh Sangeet Night",
-            eventType: "Sangeet",
-            date: "2026-02-12",
-            time: "8:00 PM",
-            location: "Jaipur, Rajasthan",
-            category: "DJ & Music",
-            budget: "₹40,000 - ₹60,000",
-            status: "counter_offer",
-            userName: "Karan Singh",
-            guestCount: 300,
-            createdAt: "2026-01-21"
-        },
-    ];
-
     const filters = [
-        { key: 'all', label: 'All', count: allRequests.length },
-        { key: 'pending', label: 'Pending', count: allRequests.filter(r => r.status === 'pending').length },
-        { key: 'accepted', label: 'Accepted', count: allRequests.filter(r => r.status === 'accepted').length },
-        { key: 'rejected', label: 'Rejected', count: allRequests.filter(r => r.status === 'rejected').length },
-        { key: 'counter_offer', label: 'Counter', count: allRequests.filter(r => r.status === 'counter_offer').length },
+        { key: 'all', label: 'All', count: requests.length },
+        { key: 'pending', label: 'Pending', count: requests.filter(r => r.status === 'pending').length },
+        { key: 'accepted', label: 'Accepted', count: requests.filter(r => r.status === 'accepted').length },
+        { key: 'rejected', label: 'Rejected', count: requests.filter(r => r.status === 'rejected').length },
+        { key: 'counter_offer', label: 'Counter', count: requests.filter(r => r.status === 'counter_offer').length },
     ];
 
-    const filteredRequests = allRequests.filter(request => {
+    const filteredRequests = requests.filter(request => {
         const matchesFilter = activeFilter === 'all' || request.status === activeFilter;
         const matchesSearch = request.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             request.userName.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesFilter && matchesSearch;
-    });
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const getStatusConfig = (status) => {
         switch (status) {
@@ -217,10 +145,20 @@ const VendorRequests = () => {
                                         <span className="px-2 py-1 bg-slate-100 rounded-lg text-xs font-medium text-slate-600">
                                             {request.category}
                                         </span>
+                                        {request.status === 'counter_offer' && request.counterPrice && (
+                                            <span className="px-2 py-1 bg-blue-100 rounded-lg text-xs font-medium text-blue-600">
+                                                Counter: ₹{(request.counterPrice / 1000).toFixed(0)}K
+                                            </span>
+                                        )}
+                                        {request.status === 'accepted' && request.finalPrice && (
+                                            <span className="px-2 py-1 bg-emerald-100 rounded-lg text-xs font-medium text-emerald-600">
+                                                Final: ₹{(request.finalPrice / 1000).toFixed(0)}K
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-1 text-sm font-semibold text-brand-pink">
                                         <IndianRupee className="w-4 h-4" />
-                                        <span>{request.budget}</span>
+                                        <span>₹{(request.budget.min / 1000).toFixed(0)}K - ₹{(request.budget.max / 1000).toFixed(0)}K</span>
                                     </div>
                                 </div>
                             </div>

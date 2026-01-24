@@ -1,60 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useVendor } from '../../../context/VendorContext';
 import {
     ArrowLeft, Bell, CheckCircle2, Calendar, IndianRupee,
-    MessageSquare, AlertCircle, Clock, Check, Trash2
+    MessageSquare, AlertCircle, Clock, Trash2, Check
 } from 'lucide-react';
 
 const VendorNotifications = () => {
     const navigate = useNavigate();
-
-    const [notifications, setNotifications] = useState([
-        {
-            id: 1,
-            type: 'new_request',
-            title: 'New Event Request',
-            message: 'Priya Sharma sent a request for Wedding Decoration',
-            time: '5 minutes ago',
-            read: false,
-            actionUrl: '/vendor/requests/1'
-        },
-        {
-            id: 2,
-            type: 'payment',
-            title: 'Payment Received',
-            message: 'You received ₹1,25,000 for Patel Wedding',
-            time: '2 hours ago',
-            read: false,
-            actionUrl: '/vendor/earnings'
-        },
-        {
-            id: 3,
-            type: 'accepted',
-            title: 'Request Accepted',
-            message: 'Rahul Verma accepted your counter offer of ₹75,000',
-            time: '5 hours ago',
-            read: true,
-            actionUrl: '/vendor/bookings'
-        },
-        {
-            id: 4,
-            type: 'reminder',
-            title: 'Event Tomorrow',
-            message: 'Singh Engagement at Royal Garden, Jaipur - 5:00 PM',
-            time: '1 day ago',
-            read: true,
-            actionUrl: '/vendor/bookings'
-        },
-        {
-            id: 5,
-            type: 'review',
-            title: 'New Review',
-            message: 'Anita Gupta left a 5-star review for your service',
-            time: '2 days ago',
-            read: true,
-            actionUrl: '/vendor/reviews'
-        },
-    ]);
+    const {
+        notifications,
+        markNotificationRead,
+        markAllNotificationsRead,
+        deleteNotification
+    } = useVendor();
 
     const getNotificationIcon = (type) => {
         switch (type) {
@@ -67,21 +26,30 @@ const VendorNotifications = () => {
         }
     };
 
-    const markAsRead = (id) => {
-        setNotifications(notifications.map(n =>
-            n.id === id ? { ...n, read: true } : n
-        ));
-    };
-
-    const markAllAsRead = () => {
-        setNotifications(notifications.map(n => ({ ...n, read: true })));
-    };
-
-    const deleteNotification = (id) => {
-        setNotifications(notifications.filter(n => n.id !== id));
+    const handleNotificationClick = (notification) => {
+        markNotificationRead(notification.id);
+        if (notification.actionUrl) {
+            navigate(notification.actionUrl);
+        }
     };
 
     const unreadCount = notifications.filter(n => !n.read).length;
+
+    // Helper to format time relative (e.g., "5 mins ago")
+    const formatTime = (isoString) => {
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) return 'Just now';
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) return `${diffInMinutes} mins ago`;
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours} hours ago`;
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) return `${diffInDays} days ago`;
+        return date.toLocaleDateString();
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans pb-8">
@@ -102,9 +70,10 @@ const VendorNotifications = () => {
                     </div>
                     {unreadCount > 0 && (
                         <button
-                            onClick={markAllAsRead}
-                            className="text-sm text-brand-pink font-medium hover:underline"
+                            onClick={markAllNotificationsRead}
+                            className="text-sm text-brand-pink font-medium hover:underline flex items-center gap-1"
                         >
+                            <Check className="w-4 h-4" />
                             Mark all read
                         </button>
                     )}
@@ -121,17 +90,14 @@ const VendorNotifications = () => {
                             return (
                                 <div
                                     key={notification.id}
-                                    onClick={() => {
-                                        markAsRead(notification.id);
-                                        navigate(notification.actionUrl);
-                                    }}
+                                    onClick={() => handleNotificationClick(notification)}
                                     className={`bg-white rounded-2xl p-4 shadow-sm border cursor-pointer transition-all ${notification.read
-                                            ? 'border-slate-100 opacity-70'
-                                            : 'border-brand-pink/20 border-l-4 border-l-brand-pink'
+                                            ? 'border-slate-100 opacity-70 hover:opacity-100'
+                                            : 'border-brand-pink/20 border-l-4 border-l-brand-pink bg-pink-50/10'
                                         } hover:shadow-md`}
                                 >
                                     <div className="flex items-start gap-4">
-                                        <div className={`w-12 h-12 rounded-xl ${iconConfig.bg} flex items-center justify-center flex-shrink-0`}>
+                                        <div className={`w-12 h-12 rounded-xl ${iconConfig.bg} flex items-center justify-center flex-shrink-0 shadow-sm`}>
                                             <IconComponent className={`w-5 h-5 ${iconConfig.color}`} />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -144,15 +110,15 @@ const VendorNotifications = () => {
                                                         e.stopPropagation();
                                                         deleteNotification(notification.id);
                                                     }}
-                                                    className="text-slate-300 hover:text-red-500 transition-colors"
+                                                    className="text-slate-300 hover:text-red-500 transition-colors p-1"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <p className="text-sm text-slate-500 mt-0.5">{notification.message}</p>
+                                            <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">{notification.message}</p>
                                             <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
-                                                {notification.time}
+                                                {formatTime(notification.time)}
                                             </p>
                                         </div>
                                     </div>

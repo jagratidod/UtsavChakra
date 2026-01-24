@@ -1,104 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useVendor } from '../../../context/VendorContext';
 import {
     ArrowLeft, Calendar, MapPin, Clock, Users, IndianRupee,
-    Phone, MessageSquare, Download, ChevronRight, CheckCircle2,
+    Phone, MessageSquare, Download, CheckCircle2,
     CalendarCheck, CalendarClock, History
 } from 'lucide-react';
 
 const VendorBookings = () => {
     const navigate = useNavigate();
+    const { bookings, completeBooking } = useVendor();
     const [activeTab, setActiveTab] = useState('upcoming');
 
-    // Mock bookings data
-    const bookings = {
-        upcoming: [
-            {
-                id: 1,
-                eventName: "Patel Wedding Reception",
-                eventType: "Wedding",
-                date: "2026-01-28",
-                time: "6:00 PM",
-                venue: "Grand Palace, Mumbai",
-                clientName: "Rahul Patel",
-                clientPhone: "+91 9876543210",
-                guestCount: 400,
-                paymentStatus: "partially_paid",
-                totalAmount: 250000,
-                paidAmount: 125000,
-                category: "Decoration"
-            },
-            {
-                id: 2,
-                eventName: "Corporate Annual Meet",
-                eventType: "Corporate",
-                date: "2026-01-30",
-                time: "10:00 AM",
-                venue: "Taj Hotel, Pune",
-                clientName: "TechCorp India",
-                clientPhone: "+91 9988776655",
-                guestCount: 200,
-                paymentStatus: "paid",
-                totalAmount: 150000,
-                paidAmount: 150000,
-                category: "Photography"
-            },
-        ],
-        today: [
-            {
-                id: 3,
-                eventName: "Singh Engagement",
-                eventType: "Engagement",
-                date: "2026-01-24",
-                time: "5:00 PM",
-                venue: "Royal Garden, Jaipur",
-                clientName: "Karan Singh",
-                clientPhone: "+91 9123456789",
-                guestCount: 150,
-                paymentStatus: "paid",
-                totalAmount: 80000,
-                paidAmount: 80000,
-                category: "Decoration"
-            },
-        ],
-        completed: [
-            {
-                id: 4,
-                eventName: "Sharma Anniversary",
-                eventType: "Anniversary",
-                date: "2026-01-15",
-                time: "7:00 PM",
-                venue: "The Oberoi, Delhi",
-                clientName: "Mr. & Mrs. Sharma",
-                clientPhone: "+91 9876501234",
-                guestCount: 100,
-                paymentStatus: "paid",
-                totalAmount: 120000,
-                paidAmount: 120000,
-                category: "Catering"
-            },
-            {
-                id: 5,
-                eventName: "Gupta Birthday Bash",
-                eventType: "Birthday",
-                date: "2026-01-10",
-                time: "8:00 PM",
-                venue: "Home Garden, Lucknow",
-                clientName: "Ankit Gupta",
-                clientPhone: "+91 9012345678",
-                guestCount: 50,
-                paymentStatus: "paid",
-                totalAmount: 45000,
-                paidAmount: 45000,
-                category: "DJ & Music"
-            },
-        ]
+    // Categorize bookings
+    const today = new Date().toISOString().split('T')[0];
+
+    const categorizedBookings = {
+        upcoming: bookings.filter(b => b.date > today && b.status !== 'completed'),
+        today: bookings.filter(b => b.date === today || b.status === 'today'),
+        completed: bookings.filter(b => b.status === 'completed')
     };
 
     const tabs = [
-        { key: 'upcoming', label: 'Upcoming', icon: CalendarClock, count: bookings.upcoming.length },
-        { key: 'today', label: "Today's", icon: CalendarCheck, count: bookings.today.length },
-        { key: 'completed', label: 'Completed', icon: History, count: bookings.completed.length },
+        { key: 'upcoming', label: 'Upcoming', icon: CalendarClock, count: categorizedBookings.upcoming.length },
+        { key: 'today', label: "Today's", icon: CalendarCheck, count: categorizedBookings.today.length },
+        { key: 'completed', label: 'Completed', icon: History, count: categorizedBookings.completed.length },
     ];
 
     const getPaymentBadge = (status) => {
@@ -109,7 +35,58 @@ const VendorBookings = () => {
         }
     };
 
-    const currentBookings = bookings[activeTab] || [];
+    const currentBookings = categorizedBookings[activeTab] || [];
+
+    const handleCompleteEvent = (bookingId) => {
+        completeBooking(bookingId);
+    };
+
+    const generateInvoice = (booking) => {
+        // Create a simple text invoice and download
+        const invoiceContent = `
+========================================
+              INVOICE
+========================================
+Invoice #: INV-${booking.id}
+Date: ${new Date().toLocaleDateString('en-IN')}
+
+EVENT DETAILS
+----------------------------------------
+Event: ${booking.eventName}
+Type: ${booking.eventType}
+Date: ${new Date(booking.date).toLocaleDateString('en-IN')}
+Time: ${booking.time}
+Venue: ${booking.venue}
+Guests: ${booking.guestCount}
+
+CLIENT DETAILS
+----------------------------------------
+Name: ${booking.clientName}
+Phone: ${booking.clientPhone}
+Email: ${booking.clientEmail}
+
+PAYMENT SUMMARY
+----------------------------------------
+Total Amount:     ₹${booking.totalAmount.toLocaleString()}
+Amount Paid:      ₹${booking.paidAmount.toLocaleString()}
+Balance Due:      ₹${(booking.totalAmount - booking.paidAmount).toLocaleString()}
+Status:           ${booking.paymentStatus.toUpperCase()}
+
+========================================
+        Thank you for your business!
+========================================
+        `;
+
+        const blob = new Blob([invoiceContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Invoice-${booking.id}-${booking.eventName.replace(/\s+/g, '-')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
@@ -174,6 +151,11 @@ const VendorBookings = () => {
                                         </div>
                                         <p className="text-sm text-slate-500">{booking.eventType} • {booking.category}</p>
                                     </div>
+                                    {booking.status === 'today' && (
+                                        <span className="px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-bold animate-pulse">
+                                            TODAY
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Event Details Grid */}
@@ -184,7 +166,7 @@ const VendorBookings = () => {
                                             Date & Time
                                         </div>
                                         <p className="font-medium text-slate-800 text-sm">
-                                            {new Date(booking.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} • {booking.time}
+                                            {new Date(booking.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} • {booking.time}
                                         </p>
                                     </div>
                                     <div className="bg-slate-50 rounded-xl p-3">
@@ -208,26 +190,59 @@ const VendorBookings = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-bold text-brand-pink">₹{(booking.paidAmount / 1000).toFixed(0)}K</p>
-                                        <p className="text-[10px] text-slate-400">of ₹{(booking.totalAmount / 1000).toFixed(0)}K</p>
+                                        <p className="font-bold text-brand-pink">₹{booking.paidAmount.toLocaleString()}</p>
+                                        <p className="text-[10px] text-slate-400">of ₹{booking.totalAmount.toLocaleString()}</p>
                                     </div>
+                                </div>
+
+                                {/* Progress Bar for Payment */}
+                                <div className="mt-3">
+                                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-gradient-to-r from-brand-pink to-brand-dark-pink rounded-full transition-all duration-500"
+                                            style={{ width: `${(booking.paidAmount / booking.totalAmount) * 100}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 mt-1 text-right">
+                                        {Math.round((booking.paidAmount / booking.totalAmount) * 100)}% paid
+                                    </p>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex gap-2 mt-4">
-                                    <button className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors">
+                                    <a
+                                        href={`tel:${booking.clientPhone}`}
+                                        className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+                                    >
                                         <Phone className="w-4 h-4" />
                                         Call
-                                    </button>
-                                    <button className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors">
+                                    </a>
+                                    <button
+                                        onClick={() => navigate('/vendor/chat')}
+                                        className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+                                    >
                                         <MessageSquare className="w-4 h-4" />
                                         Chat
                                     </button>
-                                    <button className="flex-1 py-3 rounded-xl bg-brand-pink text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-pink/30 hover:shadow-brand-pink/50 transition-all">
+                                    <button
+                                        onClick={() => generateInvoice(booking)}
+                                        className="flex-1 py-3 rounded-xl bg-brand-pink text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-pink/30 hover:shadow-brand-pink/50 transition-all"
+                                    >
                                         <Download className="w-4 h-4" />
                                         Invoice
                                     </button>
                                 </div>
+
+                                {/* Complete Button for Today's Events */}
+                                {(activeTab === 'today' || activeTab === 'upcoming') && booking.status !== 'completed' && (
+                                    <button
+                                        onClick={() => handleCompleteEvent(booking.id)}
+                                        className="w-full mt-3 py-3 rounded-xl border-2 border-emerald-500 text-emerald-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-emerald-50 transition-colors"
+                                    >
+                                        <CheckCircle2 className="w-4 h-4" />
+                                        Mark as Completed
+                                    </button>
+                                )}
                             </div>
                         );
                     })}

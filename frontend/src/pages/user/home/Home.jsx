@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import adData from '../../../data/data.json';
 import { Search, Heart, MapPin, Calendar, Bell, Plus, Edit2, IndianRupee, MessageCircle, Store, Newspaper, Home as HomeIcon, Globe, User } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { newsData } from '../../../data/newsData';
 
 const Home = () => {
     const { user, event } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
     const [currentAdIndex, setCurrentAdIndex] = useState(0);
     const [showLang, setShowLang] = useState(false);
     const [lang, setLang] = useState('EN');
@@ -301,38 +302,30 @@ const Home = () => {
             </div>
 
             {/* Bottom Navigation */}
-            <nav className="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/90 backdrop-blur-xl rounded-[32px] flex items-center justify-between px-6 shadow-2xl z-50">
-                <button
-                    onClick={() => navigate('/user/vendors')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Store className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/planner')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Calendar className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/home')}
-                    className="text-white bg-brand-pink p-2 rounded-2xl shadow-lg shadow-brand-pink/20"
-                >
-                    <HomeIcon className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/news')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Newspaper className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/chat')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <MessageCircle className="w-6 h-6" />
-                </button>
-            </nav>
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between z-50">
+                {[
+                    { icon: Store, label: 'Vendors', path: '/user/vendors' },
+                    { icon: Calendar, label: 'Planner', path: '/user/planner' },
+                    { icon: HomeIcon, label: 'Home', path: '/user/home' },
+                    { icon: Newspaper, label: 'News', path: '/user/news' },
+                    { icon: MessageCircle, label: 'Chat', path: '/user/chat' }
+                ].map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                        <button
+                            key={item.label}
+                            onClick={() => navigate(item.path)}
+                            className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-brand-pink' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <div className="relative">
+                                <Icon className={`w-6 h-6 ${isActive ? 'fill-current bg-brand-pink/10 p-0.5 rounded-lg box-content' : ''}`} />
+                            </div>
+                            <span className="text-[10px] font-medium">{item.label}</span>
+                        </button>
+                    );
+                })}
+            </div>
         </div>
     );
 };

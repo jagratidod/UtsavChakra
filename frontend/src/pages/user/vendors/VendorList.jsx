@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ChevronLeft, ArrowRight, Star, IndianRupee, MapPin, Calendar, CheckCircle } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ArrowRight, Star, IndianRupee, MapPin, Calendar, CheckCircle, X, Check, ChevronDown } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import VendorCard from '../../../components/cards/VendorCard';
 
@@ -7,24 +7,25 @@ const VendorList = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Initialize category from navigation state if available, else default to 'Decoration'
+    // State Refactored: Single Category, Multi Subcategories
     const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'Decoration');
-    const [selectedSubCategory, setSelectedSubCategory] = useState('All');
+    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false); // Custom dropdown state
+    const [selectedSubCategories, setSelectedSubCategories] = useState([]); // Array for multi-select
+    const [selectedVendorIds, setSelectedVendorIds] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    // Applied Filter States (These actively filter the list)
+    // Applied Filter States
     const [appliedSortBy, setAppliedSortBy] = useState('rating');
     const [appliedPriceRange, setAppliedPriceRange] = useState([0, 200000]);
     const [appliedSelectedDate, setAppliedSelectedDate] = useState('');
 
-    // Temporary Filter States (For the UI drawer, not applied until button click)
+    // Temporary Filter States
     const [tempSortBy, setTempSortBy] = useState('rating');
     const [tempPriceRange, setTempPriceRange] = useState([0, 200000]);
     const [tempSelectedDate, setTempSelectedDate] = useState('');
 
     const [showFilters, setShowFilters] = useState(false);
 
-    // Sync temp state with applied state when opening drawer
     const toggleFilters = () => {
         if (!showFilters) {
             setTempSortBy(appliedSortBy);
@@ -41,22 +42,14 @@ const VendorList = () => {
         setShowFilters(false);
     };
 
-    // Update category if location state changes
     useEffect(() => {
         if (location.state?.category) {
             setSelectedCategory(location.state.category);
+            setSelectedSubCategories([]); // Reset subcats on nav
         }
     }, [location.state]);
 
-    // Image array for slideshow
-    const images = [
-        '/illustrations/vendor.jpg',
-        '/illustrations/vendor2.jpg',
-        '/illustrations/vendor3.jpg',
-        '/illustrations/vendor4.jpg'
-    ];
-
-    // Categories with subcategories
+    // Categories Data
     const categories = {
         "Decoration": [
             "Engagement", "Haldi / Mehndi", "Sangeet", "Batchelor party",
@@ -72,12 +65,36 @@ const VendorList = () => {
         "Makeup Artist": ["Bride / Groom"],
         "Catering": ["Veg / Non Veg", "Live food stalls"],
         "Venues": ["Banquet Halls", "Lawns", "Resorts", "Hotels"],
-        "Photo": ["Wedding", "Events"] // Mapping for Home page icons if needed
+        "Photo": ["Wedding", "Events"]
     };
 
-    // Dummy Data with augmented fields (distance, bookedDates)
+    // Helper to change category (Single Select)
+    const handleCategoryChange = (cat) => {
+        setSelectedCategory(cat);
+        setSelectedSubCategories([]); // Reset subcats
+    };
+
+    // Helper to toggle subcategory (Multi Select)
+    const toggleSubCategory = (sub) => {
+        if (selectedSubCategories.includes(sub)) {
+            setSelectedSubCategories(prev => prev.filter(s => s !== sub));
+        } else {
+            setSelectedSubCategories(prev => [...prev, sub]);
+        }
+    };
+
+    // Helper to toggle vendor selection
+    const toggleVendorSelection = (id, e) => {
+        e.stopPropagation();
+        if (selectedVendorIds.includes(id)) {
+            setSelectedVendorIds(prev => prev.filter(vId => vId !== id));
+        } else {
+            setSelectedVendorIds(prev => [...prev, id]);
+        }
+    };
+
+    // Dummy Data
     const vendors = [
-        // Decoration Vendors
         {
             id: 1,
             name: "Royal Decorators",
@@ -134,7 +151,6 @@ const VendorList = () => {
             image: "https://images.unsplash.com/photo-1530103862676-de3c9a59af57?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
             verified: true
         },
-        // Photography
         {
             id: 7,
             name: "Creative Shots",
@@ -149,7 +165,6 @@ const VendorList = () => {
             image: "https://images.unsplash.com/photo-1516574187841-cb9cc364687c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
             verified: true
         },
-        // Makeup
         {
             id: 10,
             name: "Glam Studio",
@@ -164,7 +179,6 @@ const VendorList = () => {
             image: "https://images.unsplash.com/photo-1571781948742-0ec7b5518a91?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
             verified: true
         },
-        // Catering
         {
             id: 12,
             name: "Taste of India",
@@ -181,23 +195,16 @@ const VendorList = () => {
         }
     ];
 
-    // Slideshow effect
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-        }, 2000);
-        return () => clearInterval(interval);
-    }, [images.length]);
-
-    // Enhanced Filtering Logic
+    // Filter Logic
     const filteredVendors = vendors
         .filter(vendor => {
-            // Category Filter
+            // Category Filter (Single)
             const matchesCategory = vendor.category === selectedCategory ||
-                (selectedCategory === 'Venues' && vendor.category === 'Decoration'); // Mock Fallback for new cats
+                (selectedCategory === 'Venues' && vendor.category === 'Decoration');
 
-            // Subcategory Filter
-            const matchesSubCategory = selectedSubCategory === 'All' || vendor.subCategory === selectedSubCategory;
+            // Subcategory Filter (Multi)
+            const matchesSubCategory = selectedSubCategories.length === 0 ||
+                selectedSubCategories.includes(vendor.subCategory);
 
             // Budget Filter
             const matchesBudget = vendor.price >= appliedPriceRange[0] && vendor.price <= appliedPriceRange[1];
@@ -208,29 +215,31 @@ const VendorList = () => {
             return matchesCategory && matchesSubCategory && matchesBudget && matchesDate;
         })
         .sort((a, b) => {
+            // 1. PIN SELECTED VENDORS TO TOP
+            const aSelected = selectedVendorIds.includes(a.id);
+            const bSelected = selectedVendorIds.includes(b.id);
+            if (aSelected && !bSelected) return -1;
+            if (!aSelected && bSelected) return 1;
+
+            // 2. Normal Sorting
             switch (appliedSortBy) {
-                case 'price_asc':
-                    return a.price - b.price;
-                case 'price_desc':
-                    return b.price - a.price;
-                case 'rating':
-                    return b.rating - a.rating; // High to Low
-                case 'distance':
-                    return a.distance - b.distance; // Low to High
-                default:
-                    return 0;
+                case 'price_asc': return a.price - b.price;
+                case 'price_desc': return b.price - a.price;
+                case 'rating': return b.rating - a.rating;
+                case 'distance': return a.distance - b.distance;
+                default: return 0;
             }
         });
 
+    // Get subcategories for selected category
+    const availableSubCategories = categories[selectedCategory] || [];
+
     return (
         <div className="min-h-screen bg-brand-light-pink/30 pb-24">
-            {/* Header */}
+            {/* Header with Search and Filters */}
             <header className="bg-white sticky top-0 z-40 px-6 pt-12 pb-6 shadow-sm rounded-b-[32px]">
                 <div className="flex flex-col gap-4 mb-6">
-                    <div className="flex items-center gap-4">
-
-                        <h1 className="text-xl font-serif font-bold text-slate-800">Find Vendors</h1>
-                    </div>
+                    <h1 className="text-xl font-serif font-bold text-slate-800">Find Vendors</h1>
                 </div>
 
                 <div className="flex gap-3">
@@ -250,7 +259,7 @@ const VendorList = () => {
                     </button>
                 </div>
 
-                {/* Mobile Filter & Sort Drawer (Expandable) */}
+                {/* Drawers for Filters */}
                 {showFilters && (
                     <div className="mt-4 p-5 bg-slate-50 rounded-2xl animate-in slide-in-from-top-2 border border-slate-100 shadow-xl relative z-50">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -328,78 +337,149 @@ const VendorList = () => {
             </header>
 
             <div className="flex flex-col md:flex-row gap-6 px-6 py-8">
-                {/* Sidebar Categories */}
-                <div className="w-full md:w-64 flex-shrink-0">
-                    <div className="bg-white p-5 rounded-2xl shadow-sm sticky top-48">
-                        <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <span className="w-1 h-6 bg-brand-pink rounded-full"></span>
-                            Categories
-                        </h3>
+                {/* Sidebar Categories (Single-Select) & Subcategories (Multi-Select) */}
+                <div className="w-full md:w-72 flex-shrink-0">
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 sticky top-32">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="font-serif font-bold text-slate-800 text-lg">Categories</h3>
+                        </div>
 
-                        <div className="space-y-2 mb-4">
-                            {Object.keys(categories).map((category) => (
-                                category !== 'Photo' && category !== 'Venues' && ( // Hiding helper keys if needed, or showing them
-                                    <button
-                                        key={category}
-                                        onClick={() => {
-                                            setSelectedCategory(category);
-                                            setSelectedSubCategory('All');
-                                        }}
-                                        className={`w-full text-left p-3 rounded-xl text-sm font-bold transition-all ${selectedCategory === category ? 'bg-brand-pink/10 text-brand-pink' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`}
-                                    >
-                                        {category}
-                                    </button>
-                                )
-                            ))}
-                            {/* Explicitly showing Venues/Photo if they were passed from Home */}
-                            {['Venues', 'Photo'].includes(selectedCategory) && (
-                                <button
-                                    className="w-full text-left p-3 rounded-xl text-sm font-bold bg-brand-pink/10 text-brand-pink"
-                                >
-                                    {selectedCategory}
-                                </button>
+                        <div className="mb-8 relative z-20">
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block ml-1">
+                                Select Category
+                            </label>
+
+                            {/* Custom Dropdown Trigger */}
+                            <div
+                                className="relative group cursor-pointer"
+                                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                            >
+                                <div className={`w-full bg-slate-50 border transition-all duration-300 text-slate-800 text-sm font-bold rounded-xl p-3.5 pr-10 flex items-center justify-between ${isCategoryDropdownOpen ? 'border-brand-pink bg-white ring-2 ring-brand-pink/10' : 'border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}>
+                                    <span className="truncate">{selectedCategory}</span>
+                                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180 text-brand-pink' : ''}`} />
+                                </div>
+                            </div>
+
+                            {/* Custom Dropdown Menu */}
+                            {isCategoryDropdownOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-10" onClick={() => setIsCategoryDropdownOpen(false)}></div>
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl shadow-slate-200/50 border border-slate-100 py-2 z-20 animate-in fade-in zoom-in-95 duration-200 max-h-64 overflow-y-auto custom-scrollbar">
+                                        {Object.keys(categories).map((category) => (
+                                            (category !== 'Photo' || selectedCategory === 'Photo') && (
+                                                <div
+                                                    key={category}
+                                                    onClick={() => {
+                                                        handleCategoryChange(category);
+                                                        setIsCategoryDropdownOpen(false);
+                                                    }}
+                                                    className={`px-4 py-3 text-sm font-bold cursor-pointer transition-colors flex items-center justify-between ${selectedCategory === category
+                                                            ? 'bg-brand-pink/5 text-brand-pink'
+                                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                        }`}
+                                                >
+                                                    {category}
+                                                    {selectedCategory === category && <Check className="w-4 h-4" />}
+                                                </div>
+                                            )
+                                        ))}
+                                    </div>
+                                </>
                             )}
                         </div>
 
-                        {/* Subcategories */}
-                        <div className="space-y-1 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                            <button
-                                onClick={() => setSelectedSubCategory('All')}
-                                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${selectedSubCategory === 'All' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`}
-                            >
-                                All
-                            </button>
-                            {(categories[selectedCategory] || []).map((sub, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedSubCategory(sub)}
-                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${selectedSubCategory === sub ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`}
-                                >
-                                    {sub}
-                                </button>
-                            ))}
-                        </div>
+                        {/* Subcategories (Multi-Select Chips) */}
+                        {availableSubCategories.length > 0 && (
+                            <div className="border-t border-slate-100 pt-6">
+                                <h4 className="font-serif font-bold text-slate-800 text-sm mb-4">Filter by Type</h4>
+                                <div className="flex flex-wrap gap-2 max-h-[40vh] overflow-y-auto custom-scrollbar pr-1">
+                                    <button
+                                        onClick={() => setSelectedSubCategories([])}
+                                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${selectedSubCategories.length === 0
+                                            ? 'bg-slate-800 text-white border-slate-800 shadow-lg shadow-slate-900/20'
+                                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                            }`}
+                                    >
+                                        All Types
+                                    </button>
+                                    {availableSubCategories.map((sub, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => toggleSubCategory(sub)}
+                                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${selectedSubCategories.includes(sub)
+                                                ? 'bg-slate-800 text-white border-slate-800 shadow-lg shadow-slate-900/20'
+                                                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                                }`}
+                                        >
+                                            {sub}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Vendor Grid */}
                 <div className="flex-1">
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center mb-3">
                             <h2 className="text-lg font-bold text-slate-800">
-                                {selectedSubCategory === 'All' ? `${selectedCategory} Vendors` : `${selectedSubCategory}`}
+                                {selectedSubCategories.length === 0
+                                    ? `${selectedCategory} Vendors`
+                                    : `${selectedCategory} (${selectedSubCategories.length} Filters)`}
                             </h2>
                             <p className="text-xs text-slate-400 mt-1">
                                 {filteredVendors.length} results found
-                                {appliedSortBy !== 'rating' && ` • Sorted by ${appliedSortBy.replace('_', ' ')}`}
                             </p>
                         </div>
+
+                        {/* Selected Subcategories Tags (Top Display) */}
+                        {(selectedSubCategories.length > 0 || selectedVendorIds.length > 0) && (
+                            <div className="flex flex-wrap gap-2">
+                                {selectedSubCategories.map(sub => (
+                                    <div key={sub} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-white rounded-full text-xs font-bold shadow-sm animate-in fade-in zoom-in">
+                                        <span>{sub}</span>
+                                        <button
+                                            onClick={() => toggleSubCategory(sub)}
+                                            className="hover:bg-slate-600 rounded-full p-0.5 transition-colors"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                                {selectedVendorIds.length > 0 && (
+                                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-pink text-white rounded-full text-xs font-bold shadow-sm">
+                                        <span>{selectedVendorIds.length} Selected</span>
+                                        <button
+                                            onClick={() => setSelectedVendorIds([])}
+                                            className="hover:bg-brand-dark-pink rounded-full p-0.5 transition-colors"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {filteredVendors.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {filteredVendors.map(vendor => (
-                                <VendorCard key={vendor.id} vendor={vendor} />
+                                <div key={vendor.id} className="relative group">
+                                    <VendorCard vendor={vendor} />
+                                    {/* Selection Checkbox Overlay */}
+                                    <button
+                                        onClick={(e) => toggleVendorSelection(vendor.id, e)}
+                                        className={`absolute top-4 right-14 z-20 w-8 h-8 rounded-full flex items-center justify-center border-2 shadow-md transition-all duration-200 ${selectedVendorIds.includes(vendor.id)
+                                            ? 'bg-brand-pink border-brand-pink text-white scale-110'
+                                            : 'bg-white border-slate-200 text-slate-300 hover:border-brand-pink hover:text-brand-pink'
+                                            }`}
+                                        title={selectedVendorIds.includes(vendor.id) ? "Unselect" : "Select to pin to top"}
+                                    >
+                                        <Check className="w-5 h-5" />
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     ) : (
@@ -408,16 +488,17 @@ const VendorList = () => {
                                 <Search className="w-8 h-8 text-slate-300" />
                             </div>
                             <h3 className="text-slate-800 font-bold text-lg mb-1">No Vendors Found</h3>
-                            <p className="text-slate-400 text-sm">Try adjusting your filters or price range</p>
                             <button
                                 onClick={() => {
                                     setAppliedPriceRange([0, 200000]);
                                     setAppliedSelectedDate('');
                                     setAppliedSortBy('rating');
+                                    setSelectedCategory('Decoration');
+                                    setSelectedSubCategories([]);
                                 }}
                                 className="mt-4 text-brand-pink text-sm font-bold hover:underline"
                             >
-                                Clear Filters
+                                Clear All Filters
                             </button>
                         </div>
                     )}
@@ -426,5 +507,6 @@ const VendorList = () => {
         </div>
     );
 };
+
 
 export default VendorList;

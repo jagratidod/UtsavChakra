@@ -31,6 +31,7 @@ import VendorReviews from '../pages/vendor/reviews/Reviews';
 import VendorAvailability from '../pages/vendor/availability/Availability';
 import VendorNotifications from '../pages/vendor/notifications/Notifications';
 import VendorSettings from '../pages/vendor/settings/Settings';
+import VendorChat from '../pages/vendor/chat/Chat';
 
 const AppRoutes = () => {
     return (
@@ -53,7 +54,8 @@ const AppRoutes = () => {
             <Route path="/vendor/availability" element={<VendorAvailability />} />
             <Route path="/vendor/notifications" element={<VendorNotifications />} />
             <Route path="/vendor/settings" element={<VendorSettings />} />
-            <Route path="/vendor/chat" element={<ChatInterface />} />
+            <Route path="/vendor/chat" element={<VendorChat />} />
+            <Route path="/vendor/chat/:chatId" element={<VendorChat />} />
 
             {/* User Routes */}
             <Route path="/user/create-event" element={<CreateEvent />} />

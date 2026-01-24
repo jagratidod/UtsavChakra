@@ -1,83 +1,85 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useVendor } from '../../../context/VendorContext';
 import {
-    ArrowLeft, Calendar, ChevronLeft, ChevronRight, Check, X, Lock
+    ArrowLeft, ChevronLeft, ChevronRight, Calendar as CalendarIcon,
+    Lock, CheckCircle2, AlertCircle, RefreshCcw
 } from 'lucide-react';
 
 const VendorAvailability = () => {
     const navigate = useNavigate();
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const {
+        availability,
+        toggleDateStatus,
+        getDateStatus,
+        markMonthAvailable
+    } = useVendor();
 
-    // Mock availability data
-    const [availability, setAvailability] = useState({
-        available: ['2026-02-01', '2026-02-03', '2026-02-05', '2026-02-07', '2026-02-09', '2026-02-11', '2026-02-13', '2026-02-17', '2026-02-19', '2026-02-21', '2026-02-23', '2026-02-25', '2026-02-27'],
-        blocked: ['2026-02-06', '2026-02-12', '2026-02-20'],
-        booked: ['2026-02-02', '2026-02-08', '2026-02-15', '2026-02-22', '2026-02-28']
-    });
+    const [currentDate, setCurrentDate] = useState(new Date());
 
-    const [selectedDate, setSelectedDate] = useState(null);
-
-    const getDaysInMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDay = firstDay.getDay();
-
-        return { daysInMonth, startingDay };
+    const daysInMonth = (date) => {
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     };
 
-    const formatDate = (year, month, day) => {
-        const m = String(month + 1).padStart(2, '0');
-        const d = String(day).padStart(2, '0');
-        return `${year}-${m}-${d}`;
-    };
-
-    const getDateStatus = (dateStr) => {
-        if (availability.booked.includes(dateStr)) return 'booked';
-        if (availability.blocked.includes(dateStr)) return 'blocked';
-        if (availability.available.includes(dateStr)) return 'available';
-        return 'unset';
-    };
-
-    const toggleDateStatus = (dateStr) => {
-        const currentStatus = getDateStatus(dateStr);
-        if (currentStatus === 'booked') return; // Can't change booked dates
-
-        const newAvailability = { ...availability };
-
-        // Remove from current array
-        if (currentStatus === 'available') {
-            newAvailability.available = newAvailability.available.filter(d => d !== dateStr);
-        } else if (currentStatus === 'blocked') {
-            newAvailability.blocked = newAvailability.blocked.filter(d => d !== dateStr);
-        }
-
-        // Add to new array (cycle: unset -> available -> blocked -> unset)
-        if (currentStatus === 'unset') {
-            newAvailability.available.push(dateStr);
-        } else if (currentStatus === 'available') {
-            newAvailability.blocked.push(dateStr);
-        }
-
-        setAvailability(newAvailability);
-    };
-
-    const { daysInMonth, startingDay } = getDaysInMonth(currentMonth);
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-
-    const prevMonth = () => {
-        setCurrentMonth(new Date(year, month - 1, 1));
+    const startDayOfMonth = (date) => {
+        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
     };
 
     const nextMonth = () => {
-        setCurrentMonth(new Date(year, month + 1, 1));
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     };
 
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const prevMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    };
+
+    const renderCalendar = () => {
+        const totalDays = daysInMonth(currentDate);
+        const startDay = startDayOfMonth(currentDate);
+        const days = [];
+
+        // Empty cells for start padding
+        for (let i = 0; i < startDay; i++) {
+            days.push(<div key={`empty-${i}`} className="aspect-square"></div>);
+        }
+
+        // Day cells
+        for (let i = 1; i <= totalDays; i++) {
+            const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            const status = getDateStatus(dateStr);
+
+            let statusClasses = '';
+            // booked > blocked > available > unset
+            if (status === 'booked') {
+                statusClasses = 'bg-brand-pink/20 text-brand-pink border-brand-pink border';
+            } else if (status === 'blocked') {
+                statusClasses = 'bg-red-100 text-red-600 border-red-200 border';
+            } else if (status === 'available') {
+                statusClasses = 'bg-emerald-100 text-emerald-600 border-emerald-200 border';
+            } else {
+                statusClasses = 'bg-slate-50 text-slate-400 border-slate-100 border hover:border-slate-300';
+            }
+
+            days.push(
+                <button
+                    key={i}
+                    onClick={() => toggleDateStatus(dateStr)}
+                    className={`aspect-square rounded-xl flex flex-col items-center justify-center transition-all ${statusClasses}`}
+                >
+                    <span className="text-sm font-bold">{i}</span>
+                    <span className="text-[10px] uppercase font-medium mt-0.5">
+                        {status === 'unset' ? '' : status}
+                    </span>
+                </button>
+            );
+        }
+
+        return days;
+    };
+
+    const handleMarkMonthAvailable = () => {
+        markMonthAvailable(currentDate.getFullYear(), currentDate.getMonth(), daysInMonth(currentDate));
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans pb-8">
@@ -92,151 +94,106 @@ const VendorAvailability = () => {
                     </button>
                     <div>
                         <h1 className="text-xl font-serif font-bold text-slate-800">Availability</h1>
-                        <p className="text-xs text-slate-400">Manage your booking calendar</p>
+                        <p className="text-xs text-slate-400">Manage your calendar dates</p>
                     </div>
                 </div>
             </header>
 
             <main className="p-6">
-                {/* Legend */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-6">
-                    <div className="flex flex-wrap gap-4 justify-center">
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
-                            <span className="text-xs text-slate-600">Available</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-red-400"></div>
-                            <span className="text-xs text-slate-600">Blocked</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-brand-pink"></div>
-                            <span className="text-xs text-slate-600">Booked</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-slate-200"></div>
-                            <span className="text-xs text-slate-600">Not Set</span>
-                        </div>
+                {/* Calendar Controls */}
+                <div className="bg-white rounded-t-2xl p-6 border-b border-slate-100 flex items-center justify-between">
+                    <button
+                        onClick={prevMonth}
+                        className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200"
+                    >
+                        <ChevronLeft className="w-5 h-5 text-slate-600" />
+                    </button>
+                    <div className="text-center">
+                        <h2 className="text-xl font-bold text-slate-800">
+                            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        </h2>
                     </div>
+                    <button
+                        onClick={nextMonth}
+                        className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200"
+                    >
+                        <ChevronRight className="w-5 h-5 text-slate-600" />
+                    </button>
                 </div>
 
-                {/* Calendar */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    {/* Month Navigation */}
-                    <div className="flex items-center justify-between p-4 border-b border-slate-100">
-                        <button
-                            onClick={prevMonth}
-                            className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <h3 className="text-lg font-serif font-bold text-slate-800">
-                            {monthNames[month]} {year}
-                        </h3>
-                        <button
-                            onClick={nextMonth}
-                            className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    {/* Day Headers */}
-                    <div className="grid grid-cols-7 border-b border-slate-100">
-                        {dayNames.map((day) => (
-                            <div key={day} className="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                {/* Calendar Grid */}
+                <div className="bg-white rounded-b-2xl p-6 shadow-sm border border-slate-100 mb-6">
+                    {/* Weekday Headers */}
+                    <div className="grid grid-cols-7 mb-4">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                            <div key={day} className="text-center text-xs font-bold text-slate-400 uppercase">
                                 {day}
                             </div>
                         ))}
                     </div>
+                    {/* Days */}
+                    <div className="grid grid-cols-7 gap-3">
+                        {renderCalendar()}
+                    </div>
+                </div>
 
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1 p-2">
-                        {/* Empty cells for starting day */}
-                        {[...Array(startingDay)].map((_, i) => (
-                            <div key={`empty-${i}`} className="aspect-square"></div>
-                        ))}
-
-                        {/* Day cells */}
-                        {[...Array(daysInMonth)].map((_, i) => {
-                            const day = i + 1;
-                            const dateStr = formatDate(year, month, day);
-                            const status = getDateStatus(dateStr);
-                            const isToday = new Date().toISOString().split('T')[0] === dateStr;
-
-                            let bgColor = 'bg-slate-100 hover:bg-slate-200';
-                            let textColor = 'text-slate-700';
-                            let icon = null;
-
-                            if (status === 'available') {
-                                bgColor = 'bg-emerald-100 hover:bg-emerald-200';
-                                textColor = 'text-emerald-700';
-                                icon = <Check className="w-3 h-3" />;
-                            } else if (status === 'blocked') {
-                                bgColor = 'bg-red-100 hover:bg-red-200';
-                                textColor = 'text-red-600';
-                                icon = <X className="w-3 h-3" />;
-                            } else if (status === 'booked') {
-                                bgColor = 'bg-brand-pink text-white cursor-not-allowed';
-                                textColor = 'text-white';
-                                icon = <Lock className="w-3 h-3" />;
-                            }
-
-                            return (
-                                <button
-                                    key={day}
-                                    onClick={() => toggleDateStatus(dateStr)}
-                                    disabled={status === 'booked'}
-                                    className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all ${bgColor} ${textColor} ${isToday ? 'ring-2 ring-brand-pink ring-offset-2' : ''}`}
-                                >
-                                    <span className="text-sm font-semibold">{day}</span>
-                                    {icon && <span>{icon}</span>}
-                                </button>
-                            );
-                        })}
+                {/* Legend */}
+                <div className="flex flex-wrap gap-4 justify-center mb-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span className="text-xs font-medium text-slate-600">Available</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span className="text-xs font-medium text-slate-600">Blocked</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-brand-pink"></div>
+                        <span className="text-xs font-medium text-slate-600">Booked</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-slate-300"></div>
+                        <span className="text-xs font-medium text-slate-600">Not Set</span>
                     </div>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="mt-6 space-y-3">
-                    <button
-                        onClick={() => {
-                            // Mark all unset dates in current month as available
-                            const newAvailable = [...availability.available];
-                            for (let i = 1; i <= daysInMonth; i++) {
-                                const dateStr = formatDate(year, month, i);
-                                if (!availability.available.includes(dateStr) &&
-                                    !availability.blocked.includes(dateStr) &&
-                                    !availability.booked.includes(dateStr)) {
-                                    newAvailable.push(dateStr);
-                                }
-                            }
-                            setAvailability({ ...availability, available: newAvailable });
-                        }}
-                        className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30"
-                    >
-                        <Check className="w-5 h-5" />
-                        Mark All Available for {monthNames[month]}
-                    </button>
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                    <h3 className="font-serif font-bold text-slate-800 mb-4">Quick Actions</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                            onClick={handleMarkMonthAvailable}
+                            className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 hover:bg-emerald-100 transition-colors"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                <CheckCircle2 className="w-5 h-5" />
+                            </div>
+                            <div className="text-left">
+                                <p className="font-bold text-emerald-800 text-sm">Mark All Available</p>
+                                <p className="text-xs text-emerald-600">Set entire month as available</p>
+                            </div>
+                        </button>
 
-                    <button
-                        onClick={() => {
-                            // Clear all availability for current month (except booked)
-                            const newAvailable = availability.available.filter(d => !d.startsWith(formatDate(year, month, 1).slice(0, 7)));
-                            const newBlocked = availability.blocked.filter(d => !d.startsWith(formatDate(year, month, 1).slice(0, 7)));
-                            setAvailability({ ...availability, available: newAvailable, blocked: newBlocked });
-                        }}
-                        className="w-full py-4 rounded-xl bg-white text-slate-600 font-bold text-sm flex items-center justify-center gap-2 border border-slate-200"
-                    >
-                        Reset {monthNames[month]} Availability
-                    </button>
-                </div>
-
-                {/* Info */}
-                <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
-                    <p className="text-sm text-blue-700">
-                        <strong>Tip:</strong> Click on any date to cycle through: Available → Blocked → Unset. Booked dates cannot be changed.
-                    </p>
+                        <button
+                            onClick={() => {
+                                // Reset logic could be implemented if needed
+                                alert("This would reset the month's availability.");
+                            }}
+                            className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition-colors"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">
+                                <RefreshCcw className="w-5 h-5" />
+                            </div>
+                            <div className="text-left">
+                                <p className="font-bold text-slate-800 text-sm">Reset Month</p>
+                                <p className="text-xs text-slate-500">Clear manual settings</p>
+                            </div>
+                        </button>
+                    </div>
+                    <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-xs rounded-lg flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <p>Dates with confirmed bookings cannot be changed. Tap on any date to cycle through status: Available → Blocked → Not Set.</p>
+                    </div>
                 </div>
             </main>
         </div>
