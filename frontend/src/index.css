@@ -18,6 +18,7 @@
 @layer base {
     body {
         @apply font-sans bg-brand-light-pink text-slate-800;
+        touch-action: manipulation;
     }
 
     h1,
