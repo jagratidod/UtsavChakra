@@ -17,12 +17,45 @@ import NewsDetail from '../pages/user/news/NewsDetail';
 import CategoryList from '../pages/user/categories/CategoryList';
 import Profile from '../pages/user/profile/Profile';
 
+// Vendor Pages
+import VendorWelcome from '../pages/vendor/Welcome';
+import VendorLogin from '../pages/vendor/auth/Login';
+import VendorSignup from '../pages/vendor/auth/Signup';
+import VendorDashboard from '../pages/vendor/dashboard/Dashboard';
+import VendorRequests from '../pages/vendor/requests/RequestsList';
+import VendorRequestDetail from '../pages/vendor/requests/RequestDetail';
+import VendorBookings from '../pages/vendor/bookings/BookingsList';
+import VendorProfile from '../pages/vendor/profile/VendorProfile';
+import VendorEarnings from '../pages/vendor/earnings/Earnings';
+import VendorReviews from '../pages/vendor/reviews/Reviews';
+import VendorAvailability from '../pages/vendor/availability/Availability';
+import VendorNotifications from '../pages/vendor/notifications/Notifications';
+import VendorSettings from '../pages/vendor/settings/Settings';
+
 const AppRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<Welcome />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+
+            {/* Vendor Routes */}
+            <Route path="/vendor" element={<VendorWelcome />} />
+            <Route path="/vendor/login" element={<VendorLogin />} />
+            <Route path="/vendor/signup" element={<VendorSignup />} />
+            <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+            <Route path="/vendor/requests" element={<VendorRequests />} />
+            <Route path="/vendor/requests/:id" element={<VendorRequestDetail />} />
+            <Route path="/vendor/bookings" element={<VendorBookings />} />
+            <Route path="/vendor/profile" element={<VendorProfile />} />
+            <Route path="/vendor/earnings" element={<VendorEarnings />} />
+            <Route path="/vendor/reviews" element={<VendorReviews />} />
+            <Route path="/vendor/availability" element={<VendorAvailability />} />
+            <Route path="/vendor/notifications" element={<VendorNotifications />} />
+            <Route path="/vendor/settings" element={<VendorSettings />} />
+            <Route path="/vendor/chat" element={<ChatInterface />} />
+
+            {/* User Routes */}
             <Route path="/user/create-event" element={<CreateEvent />} />
             <Route path="/user/home" element={<Home />} />
             <Route path="/user/vendors" element={<VendorList />} />
