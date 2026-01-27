@@ -8,10 +8,12 @@ const NewsList = () => {
 
     return (
         <div className="min-h-screen bg-brand-light-pink pb-6">
-            <header className="bg-white px-6 py-8 rounded-b-[40px] shadow-sm mb-6 sticky top-0 z-30">
-                <div className="flex items-center gap-4">
-
-                    <h1 className="text-2xl font-serif font-bold text-slate-800">Wedding News</h1>
+            <header className="bg-white px-5 py-4 rounded-b-[24px] shadow-sm mb-4 sticky top-0 z-30">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-slate-50 rounded-full hover:bg-slate-100">
+                        <ChevronLeft className="w-5 h-5 text-slate-600" />
+                    </button>
+                    <h1 className="text-xl font-serif font-bold text-slate-800">Wedding News</h1>
                 </div>
             </header>
 

@@ -10,6 +10,7 @@ const VendorList = () => {
     // State Refactored: Single Category, Multi Subcategories
     const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'Decoration');
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false); // Custom dropdown state
+    const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false); // Custom sort dropdown state
     const [selectedSubCategories, setSelectedSubCategories] = useState([]); // Array for multi-select
     const [selectedVendorIds, setSelectedVendorIds] = useState([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -67,6 +68,13 @@ const VendorList = () => {
         "Venues": ["Banquet Halls", "Lawns", "Resorts", "Hotels"],
         "Photo": ["Wedding", "Events"]
     };
+
+    const sortOptions = [
+        { value: 'rating', label: 'Highest Rated' },
+        { value: 'price_asc', label: 'Price: Low to High' },
+        { value: 'price_desc', label: 'Price: High to Low' },
+        { value: 'distance', label: 'Distance (Nearest)' }
+    ];
 
     // Helper to change category (Single Select)
     const handleCategoryChange = (cat) => {
@@ -237,23 +245,23 @@ const VendorList = () => {
     return (
         <div className="min-h-screen bg-brand-light-pink/30 pb-24">
             {/* Header with Search and Filters */}
-            <header className="bg-white sticky top-0 z-40 px-6 pt-12 pb-6 shadow-sm rounded-b-[32px]">
-                <div className="flex flex-col gap-4 mb-6">
+            <header className="bg-white sticky top-0 z-40 px-5 py-4 shadow-sm rounded-b-[24px]">
+                <div className="flex flex-col gap-2 mb-3">
                     <h1 className="text-xl font-serif font-bold text-slate-800">Find Vendors</h1>
                 </div>
 
                 <div className="flex gap-3">
                     <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Search by name..."
-                            className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-brand-pink/20 focus:outline-none placeholder:text-slate-400 text-sm font-medium"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-brand-pink/20 focus:outline-none placeholder:text-slate-400 text-sm font-medium"
                         />
                     </div>
                     <button
                         onClick={toggleFilters}
-                        className={`w-12 flex items-center justify-center rounded-xl transition-colors shadow-lg ${showFilters ? 'bg-brand-pink text-white' : 'bg-slate-900 text-white shadow-slate-900/20'}`}
+                        className={`w-11 flex items-center justify-center rounded-xl transition-colors shadow-lg ${showFilters ? 'bg-brand-pink text-white' : 'bg-slate-900 text-white shadow-slate-900/20'}`}
                     >
                         <Filter className="w-5 h-5" />
                     </button>
@@ -261,26 +269,47 @@ const VendorList = () => {
 
                 {/* Drawers for Filters */}
                 {showFilters && (
-                    <div className="mt-4 p-5 bg-slate-50 rounded-2xl animate-in slide-in-from-top-2 border border-slate-100 shadow-xl relative z-50">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div className="mt-2 p-3 bg-slate-50 rounded-2xl animate-in slide-in-from-top-2 border border-slate-100 shadow-xl relative z-50">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                             {/* Sort Option */}
-                            <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Sort By</label>
-                                <select
-                                    value={tempSortBy}
-                                    onChange={(e) => setTempSortBy(e.target.value)}
-                                    className="w-full p-3 rounded-xl bg-white border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-brand-pink/20 outline-none"
+                            <div className="relative">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Sort By</label>
+                                <div
+                                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                                    className="w-full p-1.5 rounded-xl bg-white border border-slate-200 text-xs font-medium focus-within:ring-2 focus-within:ring-brand-pink/20 cursor-pointer flex justify-between items-center transition-colors hover:border-brand-pink/30"
                                 >
-                                    <option value="rating">Highest Rated</option>
-                                    <option value="price_asc">Price: Low to High</option>
-                                    <option value="price_desc">Price: High to Low</option>
-                                    <option value="distance">Distance (Nearest)</option>
-                                </select>
+                                    <span className="text-slate-700">{sortOptions.find(o => o.value === tempSortBy)?.label}</span>
+                                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isSortDropdownOpen ? 'rotate-180 text-brand-pink' : ''}`} />
+                                </div>
+
+                                {isSortDropdownOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setIsSortDropdownOpen(false)} />
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl shadow-slate-200/50 border border-slate-100 py-2 z-20 animate-in fade-in zoom-in-95 origin-top">
+                                            {sortOptions.map((option) => (
+                                                <div
+                                                    key={option.value}
+                                                    onClick={() => {
+                                                        setTempSortBy(option.value);
+                                                        setIsSortDropdownOpen(false);
+                                                    }}
+                                                    className={`px-4 py-2.5 text-sm font-bold cursor-pointer transition-colors flex items-center justify-between ${tempSortBy === option.value
+                                                        ? 'bg-brand-pink/5 text-brand-pink'
+                                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                        }`}
+                                                >
+                                                    {option.label}
+                                                    {tempSortBy === option.value && <Check className="w-4 h-4" />}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             {/* Budget Range */}
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">
                                     Max Budget: ₹{(tempPriceRange[1] / 1000).toFixed(0)}k
                                 </label>
                                 <input
@@ -290,7 +319,7 @@ const VendorList = () => {
                                     step="5000"
                                     value={tempPriceRange[1]}
                                     onChange={(e) => setTempPriceRange([0, parseInt(e.target.value)])}
-                                    className="w-full accent-brand-pink h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                                    className="w-full accent-brand-pink h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
                                 />
                                 <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-bold">
                                     <span>₹0</span>
@@ -300,34 +329,34 @@ const VendorList = () => {
 
                             {/* Date Availability */}
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Event Date</label>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Event Date</label>
                                 <div className="relative">
-                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
                                     <input
                                         type="date"
                                         value={tempSelectedDate}
                                         onChange={(e) => setTempSelectedDate(e.target.value)}
-                                        className="w-full pl-10 p-3 rounded-xl bg-white border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-brand-pink/20 outline-none text-slate-600"
+                                        className="w-full pl-9 p-1.5 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-brand-pink/20 outline-none text-slate-600"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Apply Button */}
-                        <div className="flex justify-end pt-4 border-t border-slate-200">
+                        <div className="flex justify-end pt-2 border-t border-slate-200">
                             <button
                                 onClick={() => {
                                     setTempSortBy('rating');
                                     setTempPriceRange([0, 200000]);
                                     setTempSelectedDate('');
                                 }}
-                                className="px-6 py-2.5 text-slate-500 text-sm font-bold mr-4 hover:text-slate-800 transition-colors"
+                                className="px-3 py-1.5 text-slate-500 text-xs font-bold mr-3 hover:text-slate-800 transition-colors"
                             >
                                 Reset
                             </button>
                             <button
                                 onClick={applyFilters}
-                                className="bg-brand-pink text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-brand-pink/20 hover:bg-brand-dark-pink transition-colors"
+                                className="bg-brand-pink text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-brand-pink/20 hover:bg-brand-dark-pink transition-colors"
                             >
                                 Apply Filters
                             </button>
@@ -339,13 +368,13 @@ const VendorList = () => {
             <div className="flex flex-col md:flex-row gap-6 px-6 py-8">
                 {/* Sidebar Categories (Single-Select) & Subcategories (Multi-Select) */}
                 <div className="w-full md:w-72 flex-shrink-0">
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 sticky top-32">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-serif font-bold text-slate-800 text-lg">Categories</h3>
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 sticky top-32">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-serif font-bold text-slate-800 text-base">Categories</h3>
                         </div>
 
-                        <div className="mb-8 relative z-20">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block ml-1">
+                        <div className="mb-4 relative z-20">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block ml-1">
                                 Select Category
                             </label>
 
@@ -354,7 +383,7 @@ const VendorList = () => {
                                 className="relative group cursor-pointer"
                                 onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                             >
-                                <div className={`w-full bg-slate-50 border transition-all duration-300 text-slate-800 text-sm font-bold rounded-xl p-3.5 pr-10 flex items-center justify-between ${isCategoryDropdownOpen ? 'border-brand-pink bg-white ring-2 ring-brand-pink/10' : 'border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}>
+                                <div className={`w-full bg-slate-50 border transition-all duration-300 text-slate-800 text-xs font-bold rounded-xl p-2.5 pr-8 flex items-center justify-between ${isCategoryDropdownOpen ? 'border-brand-pink bg-white ring-2 ring-brand-pink/10' : 'border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}>
                                     <span className="truncate">{selectedCategory}</span>
                                     <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180 text-brand-pink' : ''}`} />
                                 </div>
@@ -374,8 +403,8 @@ const VendorList = () => {
                                                         setIsCategoryDropdownOpen(false);
                                                     }}
                                                     className={`px-4 py-3 text-sm font-bold cursor-pointer transition-colors flex items-center justify-between ${selectedCategory === category
-                                                            ? 'bg-brand-pink/5 text-brand-pink'
-                                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                        ? 'bg-brand-pink/5 text-brand-pink'
+                                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                                         }`}
                                                 >
                                                     {category}
@@ -390,12 +419,12 @@ const VendorList = () => {
 
                         {/* Subcategories (Multi-Select Chips) */}
                         {availableSubCategories.length > 0 && (
-                            <div className="border-t border-slate-100 pt-6">
-                                <h4 className="font-serif font-bold text-slate-800 text-sm mb-4">Filter by Type</h4>
+                            <div className="border-t border-slate-100 pt-4">
+                                <h4 className="font-serif font-bold text-slate-800 text-xs mb-2.5">Filter by Type</h4>
                                 <div className="flex flex-wrap gap-2 max-h-[40vh] overflow-y-auto custom-scrollbar pr-1">
                                     <button
                                         onClick={() => setSelectedSubCategories([])}
-                                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${selectedSubCategories.length === 0
+                                        className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all border ${selectedSubCategories.length === 0
                                             ? 'bg-slate-800 text-white border-slate-800 shadow-lg shadow-slate-900/20'
                                             : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                                             }`}
@@ -406,7 +435,7 @@ const VendorList = () => {
                                         <button
                                             key={index}
                                             onClick={() => toggleSubCategory(sub)}
-                                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${selectedSubCategories.includes(sub)
+                                            className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all border ${selectedSubCategories.includes(sub)
                                                 ? 'bg-slate-800 text-white border-slate-800 shadow-lg shadow-slate-900/20'
                                                 : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                                                 }`}
