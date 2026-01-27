@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adData from '../../../data/data.json';
-import { Search, Heart, MapPin, Calendar, Bell, Plus, Edit2, IndianRupee, MessageCircle, Store, Newspaper, Home as HomeIcon, Globe, User } from 'lucide-react';
+import { Search, Heart, MapPin, Calendar, Bell, Plus, Edit2, IndianRupee, Globe, User } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { newsData } from '../../../data/newsData';
@@ -35,31 +35,31 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-brand-light-pink pb-24">
+        <div className="bg-brand-light-pink">
             {/* Header */}
-            <header className="bg-white px-6 pt-12 pb-6 rounded-b-[40px] shadow-sm">
-                <div className="flex justify-between items-center mb-6">
+            <header className="bg-white px-5 pt-5 pb-4 rounded-b-[24px] shadow-sm">
+                <div className="flex justify-between items-center mb-3">
                     <div>
-                        <p className="text-slate-400 text-sm">Hello,</p>
-                        <h1 className="text-2xl font-serif font-bold text-slate-800">{user.name}</h1>
+                        <p className="text-xs text-slate-400 font-medium ml-1">Welcome,</p>
+                        <h1 className="text-lg font-bold text-slate-800 -mt-0.5 ml-1">{user?.name || 'Guest'}</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         {/* Language Dropdown */}
                         <div className="relative z-50">
                             <button
                                 onClick={() => setShowLang(!showLang)}
-                                className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors relative"
+                                className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors relative"
                             >
-                                <Globe className="w-5 h-5" />
+                                <Globe className="w-4 h-4" />
                                 <span className="absolute -bottom-1 -right-1 text-[8px] font-bold bg-slate-200 px-1 rounded">{lang}</span>
                             </button>
                             {showLang && (
-                                <div className="absolute top-12 right-0 bg-white rounded-xl shadow-xl border border-slate-100 p-2 min-w-[140px] animate-in fade-in slide-in-from-top-2 max-h-64 overflow-y-auto">
+                                <div className="absolute top-10 right-0 bg-white rounded-xl shadow-xl border border-slate-100 p-2 min-w-[120px] animate-in fade-in slide-in-from-top-2 max-h-64 overflow-y-auto">
                                     {languages.map((l) => (
                                         <button
                                             key={l.code}
                                             onClick={() => { setLang(l.code); setShowLang(false) }}
-                                            className={`w-full text-left px-3 py-2 hover:bg-slate-50 rounded-lg text-sm font-medium ${lang === l.code ? 'text-brand-pink bg-brand-pink/5' : 'text-slate-700'}`}
+                                            className={`w-full text-left px-3 py-2 hover:bg-slate-50 rounded-lg text-xs font-medium ${lang === l.code ? 'text-brand-pink bg-brand-pink/5' : 'text-slate-700'}`}
                                         >
                                             {l.name}
                                         </button>
@@ -69,12 +69,12 @@ const Home = () => {
                         </div>
 
                         {/* Notification */}
-                        <button className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors relative">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                        <button className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors relative">
+                            <Bell className="w-4 h-4" />
+                            <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
                         </button>
 
-                        <button onClick={() => navigate('/user/profile')} className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center">
+                        <button onClick={() => navigate('/user/profile')} className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center">
                             {user.profileImage ? (
                                 <img
                                     src={user.profileImage}
@@ -82,25 +82,103 @@ const Home = () => {
                                     className="w-full h-full object-cover"
                                 />
                             ) : (
-                                <User className="w-5 h-5 text-slate-600" />
+                                <User className="w-4 h-4 text-slate-600" />
                             )}
                         </button>
                     </div>
                 </div>
 
                 <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     <input
                         type="text"
                         placeholder="Search for Venues, Decorators..."
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-brand-light-pink/50 border-none focus:ring-2 focus:ring-brand-pink/20 focus:outline-none placeholder:text-slate-400 text-sm"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-light-pink/50 border-none focus:ring-2 focus:ring-brand-pink/20 focus:outline-none placeholder:text-slate-400 text-sm"
                     />
                 </div>
             </header>
 
 
             {/* Content Area */}
-            <div className="px-6 py-8">
+            <div className="px-6 pt-2 pb-8">
+
+                {/* Categories Section */}
+                <div className="flex justify-between items-end mb-3">
+                    <h2 className="text-xl font-serif font-bold text-slate-800">Categories</h2>
+                    <button onClick={() => navigate('/user/categories')} className="text-brand-pink text-xs font-bold font-sans uppercase tracking-wider">VIEW ALL</button>
+                </div>
+
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                    {[
+                        { icon: "🏛️", name: "Venues", target: "Decoration" },
+                        { icon: "📸", name: "Photo", target: "Photography & Videography" },
+                        { icon: "💄", name: "Makeup", target: "Makeup Artist" },
+                        { icon: "🍽️", name: "Catering", target: "Catering" }
+                    ].map((cat, i) => (
+                        <div
+                            key={i}
+                            onClick={() => navigate('/user/vendors', { state: { category: cat.target || cat.name } })}
+                            className="flex flex-col items-center gap-2 cursor-pointer group"
+                        >
+                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-pink-50 group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
+                                {cat.icon}
+                            </div>
+                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight group-hover:text-brand-pink transition-colors">{cat.name}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Event Status Section (Moved) */}
+                {event ? (
+                    <div className="bg-white rounded-[32px] p-6 shadow-lg shadow-brand-pink/5 mb-8">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 className="text-lg font-serif font-bold text-slate-800">Your Big Day</h3>
+                                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Wedding Planning</p>
+                            </div>
+                            <button onClick={() => navigate('/user/create-event')} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-brand-pink hover:text-white transition-colors">
+                                <Edit2 className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-brand-light-pink/30 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center">
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-pink shadow-sm mb-1">
+                                    <Calendar className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">Date</span>
+                                <span className="text-xs font-bold text-slate-800">{new Date(event.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+                            </div>
+
+                            <div className="bg-brand-light-pink/30 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center">
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-pink shadow-sm mb-1">
+                                    <MapPin className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">Venue</span>
+                                <span className="text-xs font-bold text-slate-800 truncate w-full">{event.location}</span>
+                            </div>
+
+                            <div className="bg-brand-light-pink/30 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center">
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-pink shadow-sm mb-1">
+                                    <IndianRupee className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">Budget</span>
+                                <span className="text-xs font-bold text-slate-800">{(event.budget / 100000).toFixed(1)}L</span>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="mb-6 px-1 flex justify-between items-end">
+                        <h3 className="text-slate-800 font-serif text-2xl font-bold leading-tight">Plan Your<br />Dream Wedding</h3>
+                        <button
+                            onClick={() => navigate('/user/create-event')}
+                            className="bg-brand-pink text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-brand-pink/30 hover:bg-brand-dark-pink transition-colors mb-1"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Create
+                        </button>
+                    </div>
+                )}
 
                 {/* Advertisement Section */}
                 <div className="mb-8 relative overflow-hidden rounded-2xl shadow-lg h-40">
@@ -134,95 +212,9 @@ const Home = () => {
                 </div>
 
                 {/* Event Status Card (Hero Card) */}
-                <div className="bg-white rounded-[32px] p-2 shadow-lg shadow-brand-pink/5 mb-8">
-                    {event ? (
-                        // Case B: Event Created
-                        <div className="p-4">
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 className="text-lg font-serif font-bold text-slate-800">Your Big Day</h3>
-                                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Wedding Planning</p>
-                                </div>
-                                <button onClick={() => navigate('/user/create-event')} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-brand-pink hover:text-white transition-colors">
-                                    <Edit2 className="w-5 h-5" />
-                                </button>
-                            </div>
 
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="bg-brand-light-pink/30 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center">
-                                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-pink shadow-sm mb-1">
-                                        <Calendar className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Date</span>
-                                    <span className="text-xs font-bold text-slate-800">{new Date(event.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                                </div>
 
-                                <div className="bg-brand-light-pink/30 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center">
-                                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-pink shadow-sm mb-1">
-                                        <MapPin className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Venue</span>
-                                    <span className="text-xs font-bold text-slate-800 truncate w-full">{event.location}</span>
-                                </div>
 
-                                <div className="bg-brand-light-pink/30 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-center">
-                                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-pink shadow-sm mb-1">
-                                        <IndianRupee className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Budget</span>
-                                    <span className="text-xs font-bold text-slate-800">{(event.budget / 100000).toFixed(1)}L</span>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        // Case A: No Event Created
-                        <div className="relative overflow-hidden rounded-[28px] bg-slate-900 aspect-[2/1] group">
-                            <img
-                                src="/illustrations/event select.jpg"
-                                alt="Couple"
-                                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                            <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col items-start">
-                                <h3 className="text-white font-serif text-xl font-bold mb-1 leading-tight">Plan Your<br />Dream Wedding</h3>
-                                <button
-                                    onClick={() => navigate('/user/create-event')}
-                                    className="mt-3 bg-brand-pink text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-brand-pink/40 hover:bg-brand-dark-pink transition-colors"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Create Event
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex justify-between items-end mb-6">
-                    <h2 className="text-xl font-serif font-bold text-slate-800">Categories</h2>
-                    <button onClick={() => navigate('/user/categories')} className="text-brand-pink text-xs font-bold font-sans uppercase tracking-wider">View All</button>
-                </div>
-
-                {/* Categories Grid */}
-                <div className="grid grid-cols-4 gap-4 mb-10">
-                    {[
-                        { icon: "🏛️", name: "Venues", target: "Decoration" }, // Mapping Venues to Decoration for now as per data, or keep as Venues if data exists
-                        { icon: "📸", name: "Photo", target: "Photography & Videography" },
-                        { icon: "💄", name: "Makeup", target: "Makeup Artist" },
-                        { icon: "🍽️", name: "Catering", target: "Catering" }
-                    ].map((cat, i) => (
-                        <div
-                            key={i}
-                            onClick={() => navigate('/user/vendors', { state: { category: cat.target || cat.name } })}
-                            className="flex flex-col items-center gap-2 cursor-pointer group"
-                        >
-                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-pink-50 group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
-                                {cat.icon}
-                            </div>
-                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight group-hover:text-brand-pink transition-colors">{cat.name}</span>
-                        </div>
-                    ))}
-                </div>
 
                 {/* Featured Section */}
                 <h2 className="text-xl font-serif font-bold text-slate-800 mb-6">Popular Venues</h2>
@@ -301,31 +293,7 @@ const Home = () => {
 
             </div>
 
-            {/* Bottom Navigation */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between z-50">
-                {[
-                    { icon: Store, label: 'Vendors', path: '/user/vendors' },
-                    { icon: Calendar, label: 'Planner', path: '/user/planner' },
-                    { icon: HomeIcon, label: 'Home', path: '/user/home' },
-                    { icon: Newspaper, label: 'News', path: '/user/news' },
-                    { icon: MessageCircle, label: 'Chat', path: '/user/chat' }
-                ].map((item) => {
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
-                    return (
-                        <button
-                            key={item.label}
-                            onClick={() => navigate(item.path)}
-                            className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-brand-pink' : 'text-slate-400 hover:text-slate-600'}`}
-                        >
-                            <div className="relative">
-                                <Icon className={`w-6 h-6 ${isActive ? 'fill-current bg-brand-pink/10 p-0.5 rounded-lg box-content' : ''}`} />
-                            </div>
-                            <span className="text-[10px] font-medium">{item.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
+
         </div>
     );
 };

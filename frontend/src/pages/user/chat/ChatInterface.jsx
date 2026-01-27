@@ -86,7 +86,7 @@ const ChatInterface = () => {
                     // Chat Interface
                     <>
                         {/* Premium Header */}
-                        <div className="bg-gradient-to-r from-brand-pink to-[#E05275] p-6 pb-8 shadow-xl z-20 relative overflow-hidden">
+                        <div className="bg-gradient-to-r from-brand-pink to-[#E05275] px-5 py-4 pb-6 shadow-xl z-20 relative overflow-hidden">
                             {/* Decorative circles */}
                             <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                             <div className="absolute top-10 -left-10 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
@@ -203,14 +203,14 @@ const ChatInterface = () => {
                 ) : (
                     // Chat List Interface with Premium UI
                     <>
-                        <div className="bg-gradient-to-r from-brand-pink to-[#E05275] p-6 pb-6 shadow-xl z-20 relative overflow-hidden">
+                        <div className="bg-gradient-to-r from-brand-pink to-[#E05275] px-5 py-4 pb-6 shadow-xl z-20 relative overflow-hidden">
                             {/* Decorative circles */}
                             <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
                             <div className="absolute top-12 -left-12 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
 
-                            <div className="flex justify-between items-center text-white mb-6 relative z-10">
+                            <div className="flex justify-between items-center text-white mb-3 relative z-10">
                                 <button className="hover:bg-white/20 p-2 rounded-full transition-colors"><Menu className="w-6 h-6" /></button>
-                                <h1 className="font-serif font-bold text-2xl tracking-wide drop-shadow-sm">Chattie</h1>
+                                <h1 className="font-serif font-bold text-xl tracking-wide drop-shadow-sm">Chattie</h1>
                                 <button className="hover:bg-white/20 p-2 rounded-full transition-colors"><Camera className="w-6 h-6" /></button>
                             </div>
 

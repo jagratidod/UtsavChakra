@@ -1,197 +1,177 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Store, Calendar, Home as HomeIcon, Newspaper, MessageCircle, ChevronRight, Search, Bell } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Search, Bell } from 'lucide-react';
 
 const CategoryList = () => {
     const navigate = useNavigate();
-    const [selectedMainCategory, setSelectedMainCategory] = useState("Venues");
+    const [openCategory, setOpenCategory] = useState("Venues");
 
-    // Comprehensive Category Data matching the sidebar style request
     const categoriesData = {
         "Venues": {
-            icon: "🏛️",
+            // Light Blue
+            bgColor: "bg-[#e0e7ff]",
+            image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2698&auto=format&fit=crop",
+            label: "Venues",
+            subtext: "Banquet Halls, Marriage Garden...",
             subcategories: [
-                { name: "Wedding Venues", icon: "✨" },
-                { name: "Banquet Halls", icon: "🏢" },
-                { name: "Convention Centres", icon: "🏙️" },
-                { name: "Community Halls", icon: "🛖" },
-                { name: "Religious Community Halls", icon: "🛐" },
-                { name: "Club Houses", icon: "🏊" },
-                { name: "Conference Halls", icon: "🎙️" },
-                { name: "Auditoriums", icon: "🎭" }
+                "Banquet Halls",
+                "Marriage Garden / Lawns",
+                "Wedding Resorts",
+                "Small Function / Party Halls",
+                "Destination Wedding Venues",
+                "Kalyana Mandapams",
+                "4 Star & Above Hotels",
+                "5 Star Luxury Hotels",
+                "Wedding Farmhouses"
             ]
         },
-        "Gifting": {
-            icon: "🎁",
-            label: "Gifting & Accessories",
+        "Photographers": {
+            // Light Peach/Orange
+            bgColor: "bg-[#ffedd5]",
+            image: "https://images.unsplash.com/photo-1520854221256-17451cc330e7?q=80&w=2787&auto=format&fit=crop",
+            label: "Photographers",
+            subtext: "Photographers",
             subcategories: [
-                { name: "Favors", icon: "🍬" },
-                { name: "Packaging", icon: "📦" },
-                { name: "Trousseau Packing", icon: "🎀" }
+                "Wedding Photography",
+                "Candid Photography",
+                "Pre-Wedding Shoots",
+                "Cinematography",
+                "Traditional Photography",
+                "Drone Services",
+                "Photo Booths"
             ]
         },
-        "Transport": {
-            icon: "🚗",
-            label: "Luxury Transport",
+        "Makeup": {
+            // Light Pink
+            bgColor: "bg-[#fce7f3]", // pink-100/200ish
+            image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=2671&auto=format&fit=crop",
+            label: "Makeup",
+            subtext: "Bridal Makeup Artists, Family...",
             subcategories: [
-                { name: "Vintage Cars", icon: "🚙" },
-                { name: "Luxury Buses", icon: "🚌" }
+                "Bridal Makeup",
+                "Airbrush Makeup",
+                "Guest/Family Makeup",
+                "Hairstyling"
             ]
         },
-        "Beauty": {
-            icon: "💄",
-            label: "Beauty, Fashion & Styling",
+        "Planning": {
+            // Light Orange/Coral
+            bgColor: "bg-[#ffccbc]", // deep orange 100ish or custom
+            image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=2670&auto=format&fit=crop",
+            label: "Planning & Decor",
+            subtext: "Wedding Planners, Decorators",
             subcategories: [
-                { name: "Bridal Makeup", icon: "👰" },
-                { name: "Groom Styling", icon: "🤵" },
-                { name: "Mehendi Artist", icon: "🖐️" }
+                "Wedding Planners",
+                "Decorators",
+                "Small Event Planners"
             ]
         },
-        "Photo": {
-            icon: "📸",
-            label: "Photography & Media",
+        "Virtual": {
+            // Light Yellow/Beige
+            bgColor: "bg-[#fef3c7]",
+            image: "https://images.unsplash.com/photo-1609234656388-0aa9325c9bce?q=80&w=2670&auto=format&fit=crop",
+            label: "Virtual Planning",
+            subtext: "Virtual planning",
             subcategories: [
-                { name: "Wedding Photography", icon: "📷" },
-                { name: "Pre-wedding Shoot", icon: "💑" },
-                { name: "Drone Services", icon: "🚁" }
+                "Virtual Assistants",
+                "Online Consultations"
             ]
         },
-        "Entertainment": {
-            icon: "🎵",
-            label: "Entertainment & Live Perfs",
+        "Mehndi": {
+            // Light Brown/Earth
+            bgColor: "bg-[#e7e5e4]",
+            image: "https://images.unsplash.com/photo-1563804809605-7268b8a57371?q=80&w=2670&auto=format&fit=crop",
+            label: "Mehndi",
+            subtext: "Mehendi Artists",
             subcategories: [
-                { name: "DJs", icon: "🎧" },
-                { name: "Sangeet Choreographer", icon: "💃" },
-                { name: "Live Bands", icon: "🎸" }
-            ]
-        },
-        "Decoration": {
-            icon: "🎨",
-            label: "Decoration",
-            subcategories: [
-                { name: "Mandap Decor", icon: "🏵️" },
-                { name: "Floral Decor", icon: "🌺" }
+                "Bridal Mehndi",
+                "Guest Mehndi"
             ]
         }
     };
 
-    return (
-        <div className="h-screen bg-white flex flex-col md:flex-row pb-20 md:pb-0">
-            {/* Desktop/Tablet Sidebar wrapper (hidden on mobile usually, but here we make it the main view) */}
+    const toggleCategory = (key) => {
+        if (openCategory === key) {
+            setOpenCategory(null);
+        } else {
+            setOpenCategory(key);
+        }
+    };
 
-            {/* Header - Sticky */}
-            <header className="flex justify-between items-center px-4 py-4 border-b border-slate-100 bg-white sticky top-0 z-20">
+    return (
+        <div className="min-h-screen bg-white pb-20">
+            {/* Header */}
+            <header className="flex justify-between items-center px-5 py-4 bg-white rounded-b-[24px] shadow-sm mb-2 sticky top-0 z-50">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate(-1)} className="p-2 bg-slate-50 rounded-full hover:bg-slate-100">
                         <ChevronLeft className="w-5 h-5 text-slate-600" />
                     </button>
-                    <h1 className="text-lg font-bold text-slate-800">Shop By Category</h1>
+                    <h1 className="text-xl font-bold text-slate-800">Vendor Categories</h1>
                 </div>
                 <div className="flex gap-2">
                     <button className="p-2"><Search className="w-5 h-5 text-slate-500" /></button>
-                    <button className="p-2"><Bell className="w-5 h-5 text-slate-500" /></button>
+                    <button className="p-2 bg-slate-50 rounded-full"><Bell className="w-5 h-5 text-slate-500" /></button>
                 </div>
             </header>
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Left Sidebar (Main Categories) */}
-                <div className="w-24 md:w-64 bg-slate-50 h-full overflow-y-auto shrink-0 border-r border-slate-100">
-                    <div className="flex flex-col py-2">
-                        {Object.keys(categoriesData).map((key) => {
-                            const cat = categoriesData[key];
-                            const isActive = selectedMainCategory === key;
-                            return (
-                                <button
-                                    key={key}
-                                    onClick={() => setSelectedMainCategory(key)}
-                                    className={`flex flex-col items-center justify-center p-4 gap-2 transition-all relative ${isActive ? 'bg-white' : 'hover:bg-slate-100'}`}
-                                >
-                                    {isActive && (
-                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-pink rounded-r-full" />
-                                    )}
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors ${isActive ? 'bg-brand-light-pink text-brand-pink shadow-brand-pink/20' : 'bg-white text-slate-400 border border-slate-100'}`}>
-                                        {cat.icon}
-                                    </div>
-                                    <span className={`text-[10px] md:text-xs font-bold text-center leading-tight ${isActive ? 'text-brand-pink' : 'text-slate-500'}`}>
-                                        {cat.label || key}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+            <div className="flex flex-col">
+                {Object.entries(categoriesData).map(([key, data]) => {
+                    const isOpen = openCategory === key;
 
-                {/* Right Content (Subcategories) */}
-                <div className="flex-1 bg-white h-full overflow-y-auto p-4 md:p-8">
-                    <div className="max-w-3xl">
-                        <div className="flex items-center gap-2 mb-6">
-                            <h2 className="text-xl font-bold text-slate-800">In The Spotlight</h2>
-                            <div className="h-1 flex-1 bg-slate-50 ml-4 rounded-full max-w-[100px]">
-                                <div className="h-full w-1/2 bg-brand-pink rounded-full"></div>
+                    return (
+                        <div key={key} className="border-b border-white">
+                            {/* Accordion Header / Card */}
+                            <div
+                                onClick={() => toggleCategory(key)}
+                                className={`relative h-28 overflow-hidden cursor-pointer transition-all duration-300 ${data.bgColor}`}
+                            >
+                                <div className="absolute inset-0 flex items-center justify-between px-6 z-10">
+                                    <div className="flex flex-col max-w-[55%]">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h2 className="text-xl font-bold text-slate-800 leading-tight">
+                                                {data.label}
+                                            </h2>
+                                            <ChevronDown className={`w-5 h-5 text-slate-700 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                                        </div>
+                                        <p className="text-xs text-slate-600 font-medium truncate opacity-80">{data.subtext}</p>
+                                    </div>
+                                </div>
+
+                                {/* Decorative Half-Circle Image */}
+                                <div className="absolute top-0 bottom-0 right-0 w-[45%] h-full">
+                                    {/* Used a pseudo-circle clip visually with border-radius */}
+                                    <img
+                                        src={data.image}
+                                        alt={data.label}
+                                        className="w-full h-full object-cover rounded-l-[100px] shadow-[-10px_0_20px_rgba(0,0,0,0.05)] border-l-4 border-white/50"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Accordion Content */}
+                            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <div className="bg-white py-2 px-6">
+                                    <button
+                                        onClick={() => navigate('/user/vendors', { state: { category: key } })}
+                                        className="w-full text-left py-4 text-sm font-bold text-slate-800 border-b border-slate-100"
+                                    >
+                                        View All {data.label}
+                                    </button>
+                                    {data.subcategories.map((sub, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => navigate('/user/vendors', { state: { category: key, subCategory: sub } })}
+                                            className="w-full text-left py-4 text-sm font-medium text-slate-600 border-b border-slate-50 hover:text-brand-pink transition-colors"
+                                        >
+                                            {sub}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-
-                        <h3 className="text-sm font-bold text-orange-500 uppercase tracking-wider mb-6 pl-1 border-l-4 border-orange-500">
-                            {(categoriesData[selectedMainCategory].label || selectedMainCategory).toUpperCase()}
-                        </h3>
-
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
-                            {categoriesData[selectedMainCategory].subcategories.map((sub, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => navigate('/user/vendors', { state: { category: selectedMainCategory, subCategory: sub.name } })}
-                                    className="flex flex-col items-center gap-3 cursor-pointer group"
-                                >
-                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-3xl shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all group-hover:border-brand-pink/20 relative overflow-hidden">
-                                        {/* Mock circular border effect using box-shadow or svg could be added here for exact match */}
-                                        <div className="absolute inset-0 border-2 border-slate-100 rounded-full" />
-                                        <span className="relative z-10">{sub.icon}</span>
-                                        {/* Add a subtle sparkle icon overlaid if desired */}
-                                        <span className="absolute top-3 left-4 text-[10px] text-slate-300">✨</span>
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-700 text-center leading-tight max-w-[80px]">
-                                        {sub.name}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                    );
+                })}
             </div>
-
-            {/* Bottom Navigation */}
-            <nav className="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/90 backdrop-blur-xl rounded-[32px] flex items-center justify-between px-6 shadow-2xl z-50">
-                <button
-                    onClick={() => navigate('/user/vendors')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Store className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/planner')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Calendar className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/home')}
-                    className="text-white bg-brand-pink p-2 rounded-2xl shadow-lg shadow-brand-pink/20"
-                >
-                    <HomeIcon className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/news')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Newspaper className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/chat')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <MessageCircle className="w-6 h-6" />
-                </button>
-            </nav>
         </div>
     );
 };

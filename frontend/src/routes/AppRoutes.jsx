@@ -16,6 +16,8 @@ import NewsList from '../pages/user/news/NewsList';
 import NewsDetail from '../pages/user/news/NewsDetail';
 import CategoryList from '../pages/user/categories/CategoryList';
 import Profile from '../pages/user/profile/Profile';
+import UserLayout from '../components/layout/UserLayout';
+import VendorLayout from '../components/layout/VendorLayout';
 
 // Vendor Pages
 import VendorWelcome from '../pages/vendor/Welcome';
@@ -44,32 +46,36 @@ const AppRoutes = () => {
             <Route path="/vendor" element={<VendorWelcome />} />
             <Route path="/vendor/login" element={<VendorLogin />} />
             <Route path="/vendor/signup" element={<VendorSignup />} />
-            <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-            <Route path="/vendor/requests" element={<VendorRequests />} />
-            <Route path="/vendor/requests/:id" element={<VendorRequestDetail />} />
-            <Route path="/vendor/bookings" element={<VendorBookings />} />
-            <Route path="/vendor/profile" element={<VendorProfile />} />
-            <Route path="/vendor/earnings" element={<VendorEarnings />} />
-            <Route path="/vendor/reviews" element={<VendorReviews />} />
-            <Route path="/vendor/availability" element={<VendorAvailability />} />
-            <Route path="/vendor/notifications" element={<VendorNotifications />} />
-            <Route path="/vendor/settings" element={<VendorSettings />} />
-            <Route path="/vendor/chat" element={<VendorChat />} />
-            <Route path="/vendor/chat/:chatId" element={<VendorChat />} />
+            <Route element={<VendorLayout />}>
+                <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+                <Route path="/vendor/requests" element={<VendorRequests />} />
+                <Route path="/vendor/requests/:id" element={<VendorRequestDetail />} />
+                <Route path="/vendor/bookings" element={<VendorBookings />} />
+                <Route path="/vendor/profile" element={<VendorProfile />} />
+                <Route path="/vendor/earnings" element={<VendorEarnings />} />
+                <Route path="/vendor/reviews" element={<VendorReviews />} />
+                <Route path="/vendor/availability" element={<VendorAvailability />} />
+                <Route path="/vendor/notifications" element={<VendorNotifications />} />
+                <Route path="/vendor/settings" element={<VendorSettings />} />
+                <Route path="/vendor/chat" element={<VendorChat />} />
+                <Route path="/vendor/chat/:chatId" element={<VendorChat />} />
+            </Route>
 
             {/* User Routes */}
-            <Route path="/user/create-event" element={<CreateEvent />} />
-            <Route path="/user/home" element={<Home />} />
-            <Route path="/user/vendors" element={<VendorList />} />
-            <Route path="/user/vendor/:id" element={<VendorDetail />} />
-            <Route path="/user/chat" element={<ChatInterface />} />
-            <Route path="/user/chat/:vendorId" element={<ChatInterface />} />
-            <Route path="/user/request-quote/:vendorId" element={<RequestQuote />} />
-            <Route path="/user/planner" element={<Planner />} />
-            <Route path="/user/news" element={<NewsList />} />
-            <Route path="/user/news/:id" element={<NewsDetail />} />
-            <Route path="/user/categories" element={<CategoryList />} />
-            <Route path="/user/profile" element={<Profile />} />
+            <Route element={<UserLayout />}>
+                <Route path="/user/create-event" element={<CreateEvent />} />
+                <Route path="/user/home" element={<Home />} />
+                <Route path="/user/vendors" element={<VendorList />} />
+                <Route path="/user/vendor/:id" element={<VendorDetail />} />
+                <Route path="/user/chat" element={<ChatInterface />} />
+                <Route path="/user/chat/:vendorId" element={<ChatInterface />} />
+                <Route path="/user/request-quote/:vendorId" element={<RequestQuote />} />
+                <Route path="/user/planner" element={<Planner />} />
+                <Route path="/user/news" element={<NewsList />} />
+                <Route path="/user/news/:id" element={<NewsDetail />} />
+                <Route path="/user/categories" element={<CategoryList />} />
+                <Route path="/user/profile" element={<Profile />} />
+            </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
