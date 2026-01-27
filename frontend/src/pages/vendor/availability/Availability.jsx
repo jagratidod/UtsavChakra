@@ -51,25 +51,28 @@ const VendorAvailability = () => {
             let statusClasses = '';
             // booked > blocked > available > unset
             if (status === 'booked') {
-                statusClasses = 'bg-brand-pink/20 text-brand-pink border-brand-pink border';
+                statusClasses = 'bg-brand-pink/10 text-brand-pink border-brand-pink/30 border font-bold shadow-sm shadow-brand-pink/10';
             } else if (status === 'blocked') {
-                statusClasses = 'bg-red-100 text-red-600 border-red-200 border';
+                statusClasses = 'bg-red-50 text-red-500 border-red-100 border font-medium';
             } else if (status === 'available') {
-                statusClasses = 'bg-emerald-100 text-emerald-600 border-emerald-200 border';
+                statusClasses = 'bg-emerald-50 text-emerald-600 border-emerald-100 border font-bold shadow-sm shadow-emerald-500/10';
             } else {
-                statusClasses = 'bg-slate-50 text-slate-400 border-slate-100 border hover:border-slate-300';
+                statusClasses = 'bg-slate-50 text-slate-400 border-slate-100 border hover:border-brand-pink/30 hover:bg-white hover:shadow-md hover:text-slate-600 hover:-translate-y-1';
             }
 
             days.push(
                 <button
                     key={i}
                     onClick={() => toggleDateStatus(dateStr)}
-                    className={`aspect-square rounded-xl flex flex-col items-center justify-center transition-all ${statusClasses}`}
+                    className={`aspect-square rounded-2xl flex flex-col items-center justify-center transition-all duration-300 relative overflow-hidden group ${statusClasses}`}
                 >
-                    <span className="text-sm font-bold">{i}</span>
-                    <span className="text-[10px] uppercase font-medium mt-0.5">
-                        {status === 'unset' ? '' : status}
-                    </span>
+                    <span className="text-sm z-10">{i}</span>
+                    {status !== 'unset' && (
+                        <div className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${status === 'available' ? 'bg-emerald-500' :
+                                status === 'blocked' ? 'bg-red-400' :
+                                    'bg-brand-pink'
+                            }`}></div>
+                    )}
                 </button>
             );
         }
@@ -82,117 +85,127 @@ const VendorAvailability = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-8">
+        <div className="min-h-screen bg-slate-50 font-sans pb-24">
             {/* Header */}
-            <header className="sticky top-0 z-30 bg-white shadow-sm px-6 py-4">
+            <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md shadow-sm border-b border-indigo-50 px-6 py-4">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/vendor/dashboard')}
-                        className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors"
+                        className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors hover:shadow-sm"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div>
                         <h1 className="text-xl font-serif font-bold text-slate-800">Availability</h1>
-                        <p className="text-xs text-slate-400">Manage your calendar dates</p>
+                        <p className="text-xs text-slate-500">Manage your schedule</p>
                     </div>
                 </div>
             </header>
 
-            <main className="p-6">
-                {/* Calendar Controls */}
-                <div className="bg-white rounded-t-2xl p-6 border-b border-slate-100 flex items-center justify-between">
-                    <button
-                        onClick={prevMonth}
-                        className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200"
-                    >
-                        <ChevronLeft className="w-5 h-5 text-slate-600" />
-                    </button>
-                    <div className="text-center">
-                        <h2 className="text-xl font-bold text-slate-800">
-                            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                        </h2>
-                    </div>
-                    <button
-                        onClick={nextMonth}
-                        className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200"
-                    >
-                        <ChevronRight className="w-5 h-5 text-slate-600" />
-                    </button>
-                </div>
+            <main className="p-6 max-w-lg mx-auto">
+                {/* Hero Section / Month Selector */}
+                <div className="bg-gradient-to-br from-brand-pink to-brand-dark-pink rounded-3xl p-6 text-white shadow-xl shadow-brand-pink/20 mb-8 relative overflow-hidden">
+                    {/* Decorative Circles */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl"></div>
 
-                {/* Calendar Grid */}
-                <div className="bg-white rounded-b-2xl p-6 shadow-sm border border-slate-100 mb-6">
-                    {/* Weekday Headers */}
-                    <div className="grid grid-cols-7 mb-4">
-                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                            <div key={day} className="text-center text-xs font-bold text-slate-400 uppercase">
-                                {day}
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-6">
+                            <button
+                                onClick={prevMonth}
+                                className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all"
+                            >
+                                <ChevronLeft className="w-5 h-5 text-white" />
+                            </button>
+                            <div className="text-center">
+                                <h2 className="text-2xl font-serif font-bold text-white tracking-wide">
+                                    {currentDate.toLocaleDateString('en-US', { month: 'long' })}
+                                </h2>
+                                <p className="text-sm text-white/80 font-medium">
+                                    {currentDate.toLocaleDateString('en-US', { year: 'numeric' })}
+                                </p>
                             </div>
-                        ))}
-                    </div>
-                    {/* Days */}
-                    <div className="grid grid-cols-7 gap-3">
-                        {renderCalendar()}
+                            <button
+                                onClick={nextMonth}
+                                className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all"
+                            >
+                                <ChevronRight className="w-5 h-5 text-white" />
+                            </button>
+                        </div>
+
+                        {/* Quick Stats or Tips inside Hero */}
+                        <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <CalendarIcon className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-white/80 uppercase tracking-wider">Total Days</p>
+                                    <p className="font-bold text-lg">{daysInMonth(currentDate)}</p>
+                                </div>
+                            </div>
+                            <div className="h-8 w-px bg-white/20"></div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <CheckCircle2 className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-white/80 uppercase tracking-wider">Action</p>
+                                    <button
+                                        onClick={handleMarkMonthAvailable}
+                                        className="text-xs font-bold bg-white text-brand-pink px-3 py-1 rounded-full hover:bg-pink-50 transition-colors"
+                                    >
+                                        Mark All Free
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Legend */}
-                <div className="flex flex-wrap gap-4 justify-center mb-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <span className="text-xs font-medium text-slate-600">Available</span>
+                <div className="flex flex-wrap items-center justify-center gap-4 mb-6 px-2">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 box-shadow-sm"></div>
+                        <span className="text-xs font-bold text-emerald-700">Available</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <span className="text-xs font-medium text-slate-600">Blocked</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 border border-red-100">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                        <span className="text-xs font-bold text-red-700">Blocked</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-brand-pink"></div>
-                        <span className="text-xs font-medium text-slate-600">Booked</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                        <span className="text-xs font-medium text-slate-600">Not Set</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100">
+                        <div className="w-2.5 h-2.5 rounded-full bg-brand-pink"></div>
+                        <span className="text-xs font-bold text-brand-pink">Booked</span>
                     </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                    <h3 className="font-serif font-bold text-slate-800 mb-4">Quick Actions</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button
-                            onClick={handleMarkMonthAvailable}
-                            className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 hover:bg-emerald-100 transition-colors"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                                <CheckCircle2 className="w-5 h-5" />
+                {/* Calendar Grid */}
+                <div className="bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+                    {/* Weekday Headers */}
+                    <div className="grid grid-cols-7 mb-4">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+                            <div key={day} className={`text-center text-[10px] font-bold uppercase tracking-widest ${i === 0 || i === 6 ? 'text-brand-pink/70' : 'text-slate-400'}`}>
+                                {day}
                             </div>
-                            <div className="text-left">
-                                <p className="font-bold text-emerald-800 text-sm">Mark All Available</p>
-                                <p className="text-xs text-emerald-600">Set entire month as available</p>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => {
-                                // Reset logic could be implemented if needed
-                                alert("This would reset the month's availability.");
-                            }}
-                            className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition-colors"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">
-                                <RefreshCcw className="w-5 h-5" />
-                            </div>
-                            <div className="text-left">
-                                <p className="font-bold text-slate-800 text-sm">Reset Month</p>
-                                <p className="text-xs text-slate-500">Clear manual settings</p>
-                            </div>
-                        </button>
+                        ))}
                     </div>
-                    <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-xs rounded-lg flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        <p>Dates with confirmed bookings cannot be changed. Tap on any date to cycle through status: Available → Blocked → Not Set.</p>
+
+                    {/* Days */}
+                    <div className="grid grid-cols-7 gap-3 sm:gap-4 relative z-10">
+                        {renderCalendar()}
+                    </div>
+                </div>
+
+                {/* Tips Section */}
+                <div className="mt-8 bg-blue-50/50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-bold text-blue-800 mb-1">Managing Availability</h4>
+                        <p className="text-xs text-blue-600/80 leading-relaxed">
+                            Tap any date to toggle its status. Keeping your calendar updated helps you get more relevant requests and avoids cancellations.
+                        </p>
                     </div>
                 </div>
             </main>

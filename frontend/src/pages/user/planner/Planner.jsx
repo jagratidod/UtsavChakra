@@ -107,15 +107,15 @@ const Planner = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white pb-24">
+        <div className="min-h-screen bg-white">
             {/* Header */}
-            <header className="bg-white px-6 py-8 rounded-b-[40px] shadow-sm mb-6 sticky top-0 z-30">
+            <header className="bg-white px-5 py-4 rounded-b-[24px] shadow-sm mb-4">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-serif font-bold text-slate-800">Wedding Planner</h1>
-                        <p className="text-brand-pink font-medium text-sm">Organize your big day</p>
+                        <h1 className="text-xl font-serif font-bold text-slate-800">Wedding Planner</h1>
+                        <p className="text-brand-pink font-medium text-xs">Organize your big day</p>
                     </div>
-                    <div className="w-10 h-10 bg-brand-pink/10 rounded-full flex items-center justify-center text-brand-pink">
+                    <div className="w-9 h-9 bg-brand-pink/10 rounded-full flex items-center justify-center text-brand-pink">
                         <CalendarIcon className="w-5 h-5" />
                     </div>
                 </div>
@@ -229,38 +229,7 @@ const Planner = () => {
                     </div>
                 </div>
             )}
-            {/* Bottom Navigation */}
-            <nav className="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/90 backdrop-blur-xl rounded-[32px] flex items-center justify-between px-6 shadow-2xl z-50">
-                <button
-                    onClick={() => navigate('/user/vendors')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Store className="w-6 h-6" />
-                </button>
-                <button
-                    className="text-white bg-brand-pink p-2 rounded-2xl shadow-lg shadow-brand-pink/20"
-                >
-                    <CalendarIcon className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/home')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <HomeIcon className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/news')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <Newspaper className="w-6 h-6" />
-                </button>
-                <button
-                    onClick={() => navigate('/user/chat')}
-                    className="text-slate-400 p-2 hover:text-white transition-colors"
-                >
-                    <MessageCircle className="w-6 h-6" />
-                </button>
-            </nav>
+
         </div>
     );
 };

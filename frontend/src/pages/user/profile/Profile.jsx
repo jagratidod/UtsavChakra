@@ -50,26 +50,21 @@ const Profile = () => {
         <div className="min-h-screen bg-white pb-20">
             {/* Cover Image & Header */}
             {/* Cover Image & Header */}
-            <div className="relative h-64 w-full">
-                <img
-                    src="/illustrations/profile .jpg"
-                    alt="Cover"
-                    className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/20"></div>
+            <div className="bg-white pb-8 mb-6 relative">
+                <div className="px-6 pt-8 pb-0 flex items-center z-10 relative">
+                    <h1 className="text-xl font-bold text-slate-800">My Profile</h1>
+                </div>
 
-                <div className="absolute top-0 left-0 right-0 p-6 pt-8 flex items-center gap-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-colors border border-white/20"
-                    >
-                        <ChevronLeft className="w-5 h-5 text-white" />
-                    </button>
-                    <h1 className="text-xl font-bold text-white shadow-sm">My Profile</h1>
+                <div className="flex justify-center -mt-2">
+                    <img
+                        src="/illustrations/profile .jpg"
+                        alt="Profile Art"
+                        className="w-64 h-48 object-contain mix-blend-multiply opacity-95"
+                    />
                 </div>
             </div>
 
-            <div className="px-6 max-w-md mx-auto relative -mt-16 sm:-mt-20 z-10">
+            <div className="px-6 max-w-md mx-auto relative -mt-12 z-10">
                 <div className="flex flex-col items-center mb-8">
                     <div className="w-32 h-32 bg-brand-light-pink rounded-full flex items-center justify-center mb-3 relative overflow-hidden group border-4 border-white shadow-2xl">
                         {profileImage ? (

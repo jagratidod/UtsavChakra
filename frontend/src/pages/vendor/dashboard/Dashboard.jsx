@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useVendor } from '../../../context/VendorContext';
 import {
@@ -6,6 +6,7 @@ import {
     IndianRupee, MessageSquare, Bell, Settings, LogOut,
     Menu, X, TrendingUp, Clock, CheckCircle2, Users, ChevronRight
 } from 'lucide-react';
+import VendorSubscriptionModal from './VendorSubscriptionModal';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
@@ -20,7 +21,15 @@ const VendorDashboard = () => {
     } = useVendor();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
     const stats = getStats();
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowSubscriptionModal(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, []);
 
     const navItems = [
         { icon: Home, label: 'Dashboard', path: '/vendor/dashboard' },
@@ -92,6 +101,10 @@ const VendorDashboard = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
+            <VendorSubscriptionModal
+                isOpen={showSubscriptionModal}
+                onClose={() => setShowSubscriptionModal(false)}
+            />
             {/* Mobile Header */}
             <header className="lg:hidden sticky top-0 z-40 bg-white shadow-sm px-4 py-3 flex items-center justify-between">
                 <button
@@ -368,35 +381,6 @@ const VendorDashboard = () => {
                     </div>
                 </div>
             </main>
-            {/* Mobile Bottom Navigation */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between z-40">
-                {[
-                    { icon: Home, label: 'Home', path: '/vendor/dashboard' },
-                    { icon: FileText, label: 'Requests', path: '/vendor/requests', badge: stats.pendingRequests },
-                    { icon: Calendar, label: 'Availability', path: '/vendor/availability' },
-                    { icon: MessageSquare, label: 'Chat', path: '/vendor/chat' }
-                ].map((item) => {
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
-                    return (
-                        <button
-                            key={item.label}
-                            onClick={() => navigate(item.path)}
-                            className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-brand-pink' : 'text-slate-400 hover:text-slate-600'}`}
-                        >
-                            <div className="relative">
-                                <Icon className={`w-6 h-6 ${isActive ? 'fill-current bg-brand-pink/10 p-0.5 rounded-lg box-content' : ''}`} />
-                                {item.badge > 0 && (
-                                    <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                                        {item.badge}
-                                    </span>
-                                )}
-                            </div>
-                            <span className="text-[10px] font-medium">{item.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
         </div>
     );
 };
